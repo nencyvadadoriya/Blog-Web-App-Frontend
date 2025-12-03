@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # 📝 Blog Web App
 
 
@@ -46,11 +45,19 @@ A **full-stack Blog Application** built with **React**, **Node.js**, **Express**
 
 <table>
   <tr>
-    <td><img src="/public/img1.png" width="300" /></td>
-    <td><img src="/public/img2.png" width="300" /></td>
-    <td><img src="/public/img3.png" width="300" /></td>
+    <td><img src="./public/img1.png" width="500" /></td>
+    <td><img src="./public/img2.png" width="500" /></td>
+  </tr>
+   <tr>
+    <td><img src="./public/img-3.png" width="500" /></td>
+    <td><img src="./public/img-4.png" width="500" /></td>
+  </tr>
+  <tr>
+    <td><img src="./public/img-5.png" width="500" /></td>
+    <td><img src="./public/img-6.png" width="500" /></td>
+  </tr>
+   <tr>
+    <td><img src="./public/img-7.png" width="500" /></td>
+    <td><img src="./public/img-8.png" width="500" /></td>
   </tr>
 </table>
-=======
-# Blog-Web-App-Frontend
->>>>>>> 7b3d11387449673ebd215331e3528c7aef34831d

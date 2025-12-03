@@ -16,3 +16,7 @@ export interface OtpverifyPayload{
     email : string,
     OTP : string
 }
+export interface ChangePasswordPayload{
+    email : string,
+    newPassword : string
+}

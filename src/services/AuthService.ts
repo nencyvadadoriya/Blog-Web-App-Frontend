@@ -1,12 +1,13 @@
 import axios from "axios";
-import type { LoginBody, OtpverifyPayload, RegisterUserBody } from "../Types/Types";
+import type { ChangePasswordPayload, LoginBody, OtpverifyPayload, RegisterUserBody } from "../Types/Types";
 import toast from "react-hot-toast";
 class AuthServices {
     authBaseUrl = "https://blog-web-app-iota.vercel.app/api/";
     authLoginUrl = "auth/login";
     authRegigsterUrl = "auth/register";
     authForgetPassword = "auth/forgetPassword";
-    authVerifyOtp = "auth/verifyOtp"
+    authVerifyOtp = "auth/verifyOtp";
+    authChangePassword = "auth/changePassword";
 
     async loginUser(payload: LoginBody) {
         try {
@@ -52,6 +53,16 @@ class AuthServices {
     async otpVerify(payload: OtpverifyPayload) {
         try {
             const res = await axios.post(this.authBaseUrl + this.authVerifyOtp, payload)
+            return res.data;
+        } catch (error) {
+            console.log("somthing went wrong");
+            
+        }
+    }
+
+    async changePassword(payload : ChangePasswordPayload){
+         try {
+            const res = await axios.post(this.authBaseUrl + this.authChangePassword, payload)
             return res.data;
         } catch (error) {
             console.log("somthing went wrong");
