@@ -24,7 +24,7 @@ export default function Banner({ isSidebarCollapsed = false }: BannerProps) {
           </svg>
         </div>
 
-        <div className={`relative w-full ${isSidebarCollapsed ? 'pl-6 pr-4 sm:pl-8 sm:pr-6 lg:pl-10 lg:pr-8' : 'pl-0 pr-4 sm:pr-6 lg:pr-8'}`}>
+        <div className={`relative w-full ${isSidebarCollapsed ? 'pl-6 pr-4 sm:pl-8 sm:pr-6 lg:pl-10 lg:pr-8' : 'pl-4 pr-4 sm:pl-6 sm:pr-6 lg:pl-8 lg:pr-8'}`}>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
             {/* Left Content */}
             <div className="text-center lg:text-left">

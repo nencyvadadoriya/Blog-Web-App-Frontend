@@ -279,33 +279,55 @@ class BlogServices {
   }
 
   async getUserById(userId: string) {
-    return this.tryGet([
-      `${this.userUrl}/${userId}`,
-      `${this.userProfileUrl}/${userId}`,
-      `${this.userUrl}/user_profile/${userId}`
-    ]);
+    try {
+      return await this.tryGet([
+        `${this.userUrl}/${userId}`,
+        `${this.userProfileUrl}/${userId}`,
+        `${this.userUrl}/user_profile/${userId}`
+      ]);
+    } catch (e) {
+      try {
+        const pub = await axios.get(this.baseUrl + this.userUrl + '/public/' + userId, this.blogHeader());
+        return pub.data as any;
+      } catch {
+      }
+      const res = await axios.get(this.baseUrl + this.userUrl + '/getAllUsers', this.blogHeader());
+      const data: any = res.data;
+      const list: any[] = data?.result || data?.data || [];
+      const found = Array.isArray(list)
+        ? list.find((u: any) => String(u?._id || '') === String(userId))
+        : undefined;
+      if (!found) throw e;
+      return { ...(data || {}), result: found } as any;
+    }
   }
 
   async getUserBlogs(userId: string) {
-    return this.tryGet([
-      `${this.blogUrl}/user/${userId}`,
-      `${this.blogUrl}/user/blogs/${userId}`,
-      `${this.blogUrl}/${userId}/blogs`
-    ]);
+    const res = await axios.get(this.baseUrl + this.blogUrl, this.blogHeader());
+    const data: any = res.data;
+    const list: any[] = data?.result || data?.data || [];
+    if (!Array.isArray(list)) return { ...(data || {}), result: [] };
+
+    const filtered = list.filter((b: any) => {
+      const authorId = b?.author?._id || b?.author;
+      return String(authorId || '') === String(userId);
+    });
+
+    return { ...(data || {}), result: filtered };
   }
 
   async getUserFollowers(userId: string) {
-    return this.tryGet([
-      `${this.userUrl}/${userId}/followers`,
-      `${this.userUrl}/followers/${userId}`
-    ]);
+    const userRes = await this.getUserById(userId);
+    const user: any = (userRes as any)?.result || (userRes as any)?.data || userRes;
+    const followers = Array.isArray(user?.followers) ? user.followers : [];
+    return { result: followers } as any;
   }
 
   async getUserFollowing(userId: string) {
-    return this.tryGet([
-      `${this.userUrl}/${userId}/following`,
-      `${this.userUrl}/following/${userId}`
-    ]);
+    const userRes = await this.getUserById(userId);
+    const user: any = (userRes as any)?.result || (userRes as any)?.data || userRes;
+    const following = Array.isArray(user?.following) ? user.following : [];
+    return { result: following } as any;
   }
 }
 

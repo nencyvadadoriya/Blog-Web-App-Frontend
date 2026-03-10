@@ -98,7 +98,7 @@ export default function People() {
           <div 
             key={u._id} 
             className="flex items-center justify-between gap-3 p-4 cursor-pointer hover:bg-gray-50 transition-colors"
-            onClick={() => navigate(`/user/${u._id}`, { state: { user: u, isFollowing: !!u.isFollowing } })}
+            onClick={() => navigate(`/user/${u._id}/details`, { state: { user: u, isFollowing: !!u.isFollowing } })}
           >
             <div className="flex items-center gap-3 min-w-0">
               {u.profile_image ? (

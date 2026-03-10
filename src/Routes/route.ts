@@ -15,6 +15,7 @@ import Saved from "../Pages/Saved/Saved.tsx";
 import People from "../Pages/People/People.tsx";
 import ProfilePage from "../Pages/Profile/ProfilePage.tsx";
 import UserProfileView from "../Pages/UserProfile/UserProfileView.tsx";
+import InDetailsUserProfileView from "../Pages/UserProfile/InDetailsUserProfileView.tsx";
 
 export const routepath = {
     landing: '/',
@@ -95,6 +96,10 @@ export const route = createBrowserRouter([
             {
                 path: routepath.people,
                 Component: People
+            },
+            {
+                path: routepath.userProfile + '/:userId/details',
+                Component: InDetailsUserProfileView
             },
             {
                 path: routepath.userProfile + '/:userId',

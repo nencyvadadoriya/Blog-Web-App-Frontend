@@ -290,7 +290,7 @@ export default function Featured({ isSidebarCollapsed = false }: FeaturedProps) 
    <>
      {/* Featured Posts */}
       <section id="featured" className="py-16">
-        <div className={`w-full ${isSidebarCollapsed ? 'pl-8 pr-4 sm:pl-10 sm:pr-6 lg:pl-12 lg:pr-8' : 'pl-0 pr-4 sm:pr-6 lg:pr-8'}`}>
+        <div className={`w-full ${isSidebarCollapsed ? 'pl-8 pr-4 sm:pl-10 sm:pr-6 lg:pl-12 lg:pr-8' : 'pl-4 pr-4 sm:pl-6 sm:pr-6 lg:pl-8 lg:pr-8'}`}>
           <div className="flex items-center justify-between mb-12 gap-4">
             <h2 className="text-3xl font-bold text-gray-800">Featured Posts</h2>
 

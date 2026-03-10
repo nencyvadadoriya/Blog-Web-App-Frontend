@@ -8,7 +8,7 @@ import { blogService } from '../../services/BlogServices';
 import type { Blog, User as UserType, Comment } from '../../Types/Types';
 import toast from 'react-hot-toast/headless';
 
-export default function UserProfileView() {
+export default function InDetailsUserProfileView() {
   const { userId } = useParams<{ userId: string }>();
   const navigate = useNavigate();
   const location = useLocation();
@@ -23,6 +23,7 @@ export default function UserProfileView() {
   const [isFollowing, setIsFollowing] = useState<boolean>(!!stateIsFollowing);
   const [activeTab, setActiveTab] = useState<'posts' | 'likes' | 'comments'>('posts');
   const [activeConnectionTab, setActiveConnectionTab] = useState<'followers' | 'following' | null>(null);
+
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(() => {
     const saved = localStorage.getItem('sidebarCollapsed');
     return saved ? JSON.parse(saved) : false;
@@ -46,57 +47,39 @@ export default function UserProfileView() {
     const load = async () => {
       setLoading(true);
       try {
-        // Use state user if available, otherwise fetch
-        let currentUser = user;
-        if (!currentUser) {
-          try {
-            const userRes = await blogService.getUserById(userId);
-            console.log('User API Response:', userRes);
-            let userData = userRes?.result || userRes?.data || userRes;
-            if (userData && typeof userData === 'object') {
-              currentUser = userData;
-              setUser(userData);
-              if (typeof userData.isFollowing === 'boolean') {
-                setIsFollowing(userData.isFollowing);
-              }
+        try {
+          const userRes = await blogService.getUserById(userId);
+          const userData = (userRes as any)?.result || (userRes as any)?.data || userRes;
+          if (userData && typeof userData === 'object') {
+            setUser(userData);
+            if (typeof userData.isFollowing === 'boolean') {
+              setIsFollowing(userData.isFollowing);
             }
-          } catch (userErr) {
-            console.log('getUserById failed (expected if endpoint not available):', userErr);
           }
+        } catch {
         }
 
-        // Fetch user blogs separately so one failure doesn't stop others
         try {
           const blogsRes = await blogService.getUserBlogs(userId);
-          console.log('Blogs API Response:', blogsRes);
-          let blogs = blogsRes?.result || blogsRes?.data || blogsRes || [];
-          console.log('Extracted blogs:', blogs);
-          console.log('Blogs isArray:', Array.isArray(blogs));
-          console.log('Blogs length:', Array.isArray(blogs) ? blogs.length : 'not array');
+          const blogs = (blogsRes as any)?.result || (blogsRes as any)?.data || blogsRes || [];
           setUserBlogs(Array.isArray(blogs) ? blogs : []);
-        } catch (blogsErr) {
-          console.error('getUserBlogs failed:', blogsErr);
+        } catch {
           setUserBlogs([]);
         }
 
-        // Fetch followers and following separately
         try {
           const followersRes = await blogService.getUserFollowers(userId);
-          console.log('Followers API Response:', followersRes);
-          let followersData = followersRes?.result || followersRes?.data || followersRes || [];
+          const followersData = (followersRes as any)?.result || (followersRes as any)?.data || followersRes || [];
           setFollowers(Array.isArray(followersData) ? followersData : []);
-        } catch (followersErr) {
-          console.log('getUserFollowers failed:', followersErr);
+        } catch {
           setFollowers([]);
         }
 
         try {
           const followingRes = await blogService.getUserFollowing(userId);
-          console.log('Following API Response:', followingRes);
-          let followingData = followingRes?.result || followingRes?.data || followingRes || [];
+          const followingData = (followingRes as any)?.result || (followingRes as any)?.data || followingRes || [];
           setFollowing(Array.isArray(followingData) ? followingData : []);
-        } catch (followingErr) {
-          console.log('getUserFollowing failed:', followingErr);
+        } catch {
           setFollowing([]);
         }
       } catch (e: any) {
@@ -137,10 +120,9 @@ export default function UserProfileView() {
         setIsFollowing(true);
         toast.success('Followed successfully');
       }
-      // Refresh followers count
       const followersRes = await blogService.getUserFollowers(userId);
       setFollowers(((followersRes as any)?.result as UserType[]) || []);
-    } catch (error) {
+    } catch {
       toast.error('Failed to update follow status');
     }
   };
@@ -153,10 +135,9 @@ export default function UserProfileView() {
 
         <main className="flex-1">
           <div className="min-h-screen bg-white">
-            {/* Back Button */}
             <div className="pt-4 px-4 sm:px-6 lg:px-8">
               <button
-                onClick={() => navigate('/people')}
+                onClick={() => navigate('/homepage')}
                 className="flex items-center gap-2 text-gray-600 hover:text-[#0077b6] transition-colors"
               >
                 <ArrowLeft className="w-5 h-5" />
@@ -166,17 +147,12 @@ export default function UserProfileView() {
 
             <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-                {/* Left Sidebar - Profile Info */}
                 <div className="lg:col-span-4">
                   <div className="sticky top-20">
-                    {/* Profile Card */}
                     <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-sm">
-                      {/* Cover Image */}
                       <div className="h-24 bg-gradient-to-r from-[#0077b6] to-[#005a8c]"></div>
 
-                      {/* Profile Info */}
                       <div className="px-6 pb-6">
-                        {/* Avatar */}
                         <div className="relative -mt-12 mb-4">
                           {user?.profile_image ? (
                             <img
@@ -191,16 +167,11 @@ export default function UserProfileView() {
                           )}
                         </div>
 
-                        {/* Name & Email */}
                         <h1 className="text-2xl font-bold text-gray-900">{user?.name || 'Loading...'}</h1>
                         <p className="text-gray-500 text-sm mt-1">{user?.email}</p>
 
-                        {/* Bio */}
-                        <p className="text-gray-700 mt-4 text-sm leading-relaxed">
-                          {user?.about || 'No bio available'}
-                        </p>
+                        <p className="text-gray-700 mt-4 text-sm leading-relaxed">{user?.about || 'No bio available'}</p>
 
-                        {/* Follow Button */}
                         <button
                           onClick={handleFollowToggle}
                           className={`w-full mt-6 flex items-center justify-center gap-2 px-6 py-2.5 rounded-full font-medium transition-all ${
@@ -222,7 +193,6 @@ export default function UserProfileView() {
                           )}
                         </button>
 
-                        {/* Stats */}
                         <div className="flex items-center justify-center gap-6 mt-6 pt-6 border-t border-gray-100">
                           <button
                             type="button"
@@ -265,14 +235,14 @@ export default function UserProfileView() {
                                   const id = typeof u === 'string' ? u : u?._id;
                                   const name = typeof u === 'string' ? '' : u?.name || '';
                                   const email = typeof u === 'string' ? '' : u?.email || '';
-                                  const primary = email || name || (id ? String(id) : '');
+                                  const primary = email || name || '';
                                   const secondary = email && name ? name : '';
                                   return (
                                     <button
                                       key={id || idx}
                                       type="button"
                                       onClick={() => {
-                                        if (id) navigate(`/user/${id}`);
+                                        if (id) navigate(`/user/${id}/details`);
                                       }}
                                       className="w-full text-left px-3 py-2 hover:bg-gray-50"
                                     >
@@ -288,7 +258,6 @@ export default function UserProfileView() {
                       </div>
                     </div>
 
-                    {/* Navigation Tabs - Desktop */}
                     <div className="hidden lg:block mt-6 bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
                       <nav className="flex flex-col">
                         <button
@@ -332,9 +301,7 @@ export default function UserProfileView() {
                   </div>
                 </div>
 
-                {/* Right Content - Posts */}
                 <div className="lg:col-span-8">
-                  {/* Mobile Tabs */}
                   <div className="lg:hidden mb-6">
                     <div className="flex border-b border-gray-200 bg-white rounded-t-xl">
                       <button
@@ -370,23 +337,6 @@ export default function UserProfileView() {
                     </div>
                   </div>
 
-                  {/* Stats Cards - Mobile Only */}
-                  <div className="lg:hidden grid grid-cols-3 gap-3 mb-6">
-                    <div className="bg-white rounded-xl p-4 border border-gray-200 text-center">
-                      <div className="text-xl font-bold text-gray-900">{loading ? '-' : stats.totalPosts}</div>
-                      <div className="text-xs text-gray-500 mt-0.5">Posts</div>
-                    </div>
-                    <div className="bg-white rounded-xl p-4 border border-gray-200 text-center">
-                      <div className="text-xl font-bold text-gray-900">{loading ? '-' : followers.length}</div>
-                      <div className="text-xs text-gray-500 mt-0.5">Followers</div>
-                    </div>
-                    <div className="bg-white rounded-xl p-4 border border-gray-200 text-center">
-                      <div className="text-xl font-bold text-gray-900">{loading ? '-' : following.length}</div>
-                      <div className="text-xs text-gray-500 mt-0.5">Following</div>
-                    </div>
-                  </div>
-
-                  {/* Content */}
                   <div className="bg-white rounded-2xl border border-gray-200 shadow-sm min-h-[400px]">
                     {loading ? (
                       <div className="flex items-center justify-center py-20">
@@ -394,14 +344,12 @@ export default function UserProfileView() {
                       </div>
                     ) : (
                       <div className="p-6">
-                        {/* Posts Tab */}
                         {activeTab === 'posts' && (
                           <div className="space-y-6">
                             {userBlogs.length === 0 ? (
                               <div className="text-center py-16 text-gray-500">
                                 <FileText className="w-16 h-16 mx-auto mb-4 text-gray-300" />
                                 <p className="text-lg">No posts yet</p>
-                                <p className="text-sm mt-1">This user hasn&apos;t published any posts.</p>
                               </div>
                             ) : (
                               userBlogs.map(blog => (
@@ -420,14 +368,6 @@ export default function UserProfileView() {
                                     </div>
                                   )}
                                   <div className="flex items-center gap-2 mb-2">
-                                    <span className="text-xs text-gray-500">
-                                      {new Date(blog.create_at || '').toLocaleDateString('en-US', {
-                                        month: 'short',
-                                        day: 'numeric',
-                                        year: 'numeric'
-                                      })}
-                                    </span>
-                                    <span className="text-gray-300">·</span>
                                     <span className="bg-[#e6f0fa] text-[#0077b6] text-xs px-2 py-0.5 rounded-full font-medium">
                                       {blog.category}
                                     </span>
@@ -435,9 +375,7 @@ export default function UserProfileView() {
                                   <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-[#0077b6] transition-colors">
                                     {blog.title}
                                   </h3>
-                                  <p className="text-gray-600 text-sm mb-4 line-clamp-2">
-                                    {blog.subtitle}
-                                  </p>
+                                  <p className="text-gray-600 text-sm mb-4 line-clamp-2">{blog.subtitle}</p>
                                   <div className="flex items-center gap-4 text-sm text-gray-500">
                                     <span className="flex items-center gap-1">
                                       <Heart className="w-4 h-4" />
@@ -455,7 +393,6 @@ export default function UserProfileView() {
                           </div>
                         )}
 
-                        {/* Liked Posts Tab */}
                         {activeTab === 'likes' && (
                           <div className="space-y-6">
                             {stats.blogsWithLikes.length === 0 ? (
@@ -477,9 +414,7 @@ export default function UserProfileView() {
                                   <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-[#0077b6] transition-colors">
                                     {blog.title}
                                   </h3>
-                                  <p className="text-gray-600 text-sm line-clamp-2">
-                                    {blog.subtitle}
-                                  </p>
+                                  <p className="text-gray-600 text-sm line-clamp-2">{blog.subtitle}</p>
                                   <hr className="mt-6 border-gray-100" />
                                 </article>
                               ))
@@ -487,7 +422,6 @@ export default function UserProfileView() {
                           </div>
                         )}
 
-                        {/* Comments Tab */}
                         {activeTab === 'comments' && (
                           <div className="space-y-6">
                             {stats.allComments.length === 0 ? (
@@ -498,14 +432,9 @@ export default function UserProfileView() {
                             ) : (
                               stats.allComments.map((comment, idx) => (
                                 <div key={`${comment._id}-${idx}`} className="bg-gray-50 rounded-xl p-4">
-                                  <p className="text-sm font-medium text-[#0077b6] mb-2">
-                                    On: {comment.blogTitle}
-                                  </p>
+                                  <p className="text-sm font-medium text-[#0077b6] mb-2">On: {comment.blogTitle}</p>
                                   <p className="text-gray-800">{comment.msg}</p>
-                                  <p className="text-sm text-gray-500 mt-2">
-                                    — {comment.userId?.name || 'Anonymous'}
-                                  </p>
-                                  <hr className="mt-4 border-gray-200" />
+                                  <p className="text-sm text-gray-500 mt-2">— {comment.userId?.name || 'Anonymous'}</p>
                                 </div>
                               ))
                             )}
