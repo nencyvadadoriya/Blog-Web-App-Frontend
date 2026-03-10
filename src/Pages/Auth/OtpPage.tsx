@@ -5,7 +5,6 @@ import { authService } from "../../services/AuthService";
 import type { OtpverifyPayload } from "../../Types/Types";
 import toast from "react-hot-toast";
 import { Mail, Clock } from "lucide-react";
-import Skeleton from "../../Components/Skeleton/Skeleton";
 
 export default function OtpPage() {
     const [email, setEmail] = useState<string>("");

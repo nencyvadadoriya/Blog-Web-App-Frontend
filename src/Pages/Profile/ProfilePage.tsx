@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState, useRef } from 'react';
-import { Heart, MessageSquare, FileText, User, Edit3, Settings, Camera, X, Check, Sparkles } from 'lucide-react';
+import { Heart, MessageSquare, FileText, User, Edit3, Settings, Camera, X, Check } from 'lucide-react';
 import Header from '../../Components/Header/Header';
 import Sidebar from '../../Components/Sidebar/Sidebar';
 import Footer from '../../Components/Footer/Footer';
