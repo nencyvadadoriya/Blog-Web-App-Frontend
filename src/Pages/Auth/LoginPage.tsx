@@ -1,5 +1,4 @@
-import { EyeOff, Mail, Lock, BookOpen, Eye } from "lucide-react";
-import img1 from "../../img1.jpg";
+import { EyeOff, Mail, Lock, BookOpen, Eye, PenTool, Users, TrendingUp } from "lucide-react";
 import { Link, useNavigate } from "react-router";
 import { useState } from "react";
 import type { LoginBody } from "../../Types/Types";
@@ -21,6 +20,15 @@ export default function LoginPage() {
       const credential = GoogleAuthProvider.credentialFromResult(result);
       const token = credential!.accessToken;
       localStorage.setItem('token', token!);
+      const googleUser = result.user;
+      localStorage.setItem(
+        'user',
+        JSON.stringify({
+          name: googleUser.displayName || '',
+          email: googleUser.email || '',
+          profile_image: googleUser.photoURL || ''
+        })
+      );
       navigate(routepath.HomePage, { replace: true });
     }).catch(error => {
       console.log("Error Code : ", error.code);
@@ -81,17 +89,47 @@ export default function LoginPage() {
     console.log("Login Data:", loginData);
     if (loginData.email && loginData.password) {
       setLoader(true)
-      const data = await authService.loginUser(loginData)
+      const data: any = await authService.loginUser(loginData)
+      if (!data) {
+        const msg = "Something went wrong. Please try again later.";
+        setLoginFailed(msg);
+        toast.error(msg);
+        setLoader(false)
+        return;
+      }
+
       if (!data.error) {
         toast.success(data.msg)
         localStorage.setItem('token', data.result.token)
+        try {
+          const payloadUser = (data as any)?.result?.user || (data as any)?.result?.result || (data as any)?.result;
+          const _id = String(payloadUser?._id || payloadUser?.id || '');
+          const email = String(payloadUser?.email || loginData.email || '');
+          const name = String(payloadUser?.name || '');
+          const profile_image = String(payloadUser?.profile_image || '');
+          if (email) {
+            localStorage.setItem(
+              'user',
+              JSON.stringify({
+                _id,
+                name,
+                email,
+                profile_image
+              })
+            );
+          }
+        } catch {
+        }
         navigate(routepath.HomePage, { replace: true })
+        setLoader(false)
+        setLoginData({ email: "", password: "" })
+        return;
       } else {
         setLoginFailed(data.msg)
+        toast.error(data.msg)
       }
     }
     setLoader(false)
-    setLoginData({ email: "", password: "" })
 
   };
 
@@ -102,10 +140,10 @@ export default function LoginPage() {
         <div className="max-w-md w-full">
           {/* Logo */}
           <div className="flex items-center gap-3 mb-5">
-            <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center shadow-md">
+            <div className="w-8 h-8 bg-[#0077b6] rounded-lg flex items-center justify-center shadow-md">
               <BookOpen className="w-4 h-4 text-white fill-white" />
             </div>
-            <span className="text-xl font-bold text-gray-800 tracking-tight">
+            <span className="text-xl font-bold text-[#1e4b7a] tracking-tight">
               BlogSphere
             </span>
           </div>
@@ -120,7 +158,7 @@ export default function LoginPage() {
           <div className="grid grid-cols-2 gap-3 mb-6">
             <button
               onClick={handleLoginWithGoogle}
-              className="flex items-center justify-center gap-2 px-3 py-2 border-2 border-gray-200 rounded-xl font-semibold text-gray-700 hover:border-blue-500 hover:bg-blue-50 transition-all duration-200 text-xs"
+              className="flex items-center justify-center gap-2 px-3 py-2 border-2 border-gray-200 rounded-xl font-semibold text-gray-700 hover:border-[#0077b6] hover:bg-[#f0f7ff] transition-all duration-200 text-xs"
             >
               <svg className="w-4 h-4" viewBox="0 0 24 24">
                 <path
@@ -143,7 +181,7 @@ export default function LoginPage() {
               Google
             </button>
 
-            <button className="flex items-center justify-center gap-2 px-3 py-2 border-2 border-gray-200 rounded-xl font-semibold text-gray-700 hover:border-blue-500 hover:bg-blue-50 transition-all duration-200 text-xs">
+            <button className="flex items-center justify-center gap-2 px-3 py-2 border-2 border-gray-200 rounded-xl font-semibold text-gray-700 hover:border-[#0077b6] hover:bg-[#f0f7ff] transition-all duration-200 text-xs">
               <svg className="w-4 h-4" fill="#1877F2" viewBox="0 0 24 24">
                 <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
               </svg>
@@ -187,7 +225,7 @@ export default function LoginPage() {
                 onChange={handleChange}
                 placeholder="Email"
                 className={`w-full pl-10 pr-3 py-2 border-2 rounded-xl 
-                focus:border-blue-600 outline-none text-gray-700 text-sm
+                focus:border-[#0077b6] outline-none text-gray-700 text-sm
                 ${errors.email ? "border-red-500" : "border-gray-200"}`}
               />
             </div>
@@ -206,7 +244,7 @@ export default function LoginPage() {
                 onChange={handleChange}
                 placeholder="Password"
                 className={`w-full pl-10 pr-10 py-2 border-2 rounded-xl 
-                focus:border-blue-600 outline-none text-gray-700 text-sm
+                focus:border-[#0077b6] outline-none text-gray-700 text-sm
                 ${errors.password ? "border-red-500" : "border-gray-200"}`}
               />
 
@@ -225,29 +263,27 @@ export default function LoginPage() {
             <div className="flex justify-end -mt-2 mb-4">
               <Link
                 to={routepath.ForgotPassword}
-                className="text-sm font-semibold text-blue-600 hover:text-blue-700 transition-all"
+                className="text-sm font-semibold text-[#0077b6] hover:text-[#005a8c] transition-all"
               >
                 Forgot Password?
               </Link>
             </div>
 
             {/* Submit Button with Custom Loader */}
-
             <button
               type="submit"
               disabled={loader}
-              className="w-full bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 
-                  text-white font-semibold py-3.5 rounded-xl transition-all duration-300 shadow-lg 
-                  hover:shadow-xl transform hover:scale-[1.02] active:scale-[0.98] 
-                  disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none
-                  disabled:hover:shadow-lg relative overflow-hidden group"
+              className="w-full bg-[#0077b6] hover:bg-[#005a8c] text-white font-semibold py-3.5 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none disabled:hover:shadow-lg relative overflow-hidden group"
             >
               <div className="absolute inset-0 bg-white/20 transform -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
               {loader ? (
-                <div className="flex items-center justify-center gap-2 relative z-10">
-                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                  <span>Sending Instructions...</span>
-                </div>
+                <span className="relative z-10 flex items-center justify-center gap-2">
+                  <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Login
+                </span>
               ) : (
                 <span className="relative z-10 flex items-center justify-center gap-2">
                   <svg
@@ -273,7 +309,7 @@ export default function LoginPage() {
             Don't have an account?{" "}
             <Link
               to={routepath.register}
-              className="text-blue-600 hover:text-blue-700 font-bold transition-colors"
+              className="text-[#0077b6] hover:text-[#005a8c] font-bold transition-colors"
             >
               Create an account
             </Link>
@@ -281,15 +317,96 @@ export default function LoginPage() {
         </div>
       </div>
 
-      {/* Right Side */}
-      <div className="hidden lg:flex w-1/2 h-full bg-[#1E6FFB] items-center justify-center relative overflow-hidden">
-        <img
-          src={img1}
-          alt="Dashboard illustration"
-          className="w-full h-full object-cover"
-        />
+      {/* Right Side - SVG Design with Theme Colors */}
+      <div className="hidden lg:flex w-1/2 h-full bg-gradient-to-br from-[#0077b6] to-[#1e4b7a] items-center justify-center relative overflow-hidden">
+        {/* Animated Background Circles */}
+        <div className="absolute top-0 left-0 w-96 h-96 bg-white/5 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-0 right-0 w-96 h-96 bg-white/5 rounded-full blur-3xl animate-pulse delay-1000"></div>
+        
+        {/* Main SVG Content */}
+        <div className="relative z-10 w-full max-w-lg px-8">
+          {/* Blogging Illustration SVG */}
+          <svg viewBox="0 0 400 400" className="w-full h-auto">
+            {/* Background decorative elements */}
+            <circle cx="200" cy="200" r="180" fill="none" stroke="rgba(255,255,255,0.1)" strokeWidth="2" strokeDasharray="8 8"/>
+            <circle cx="200" cy="200" r="140" fill="none" stroke="rgba(255,255,255,0.1)" strokeWidth="2" strokeDasharray="8 8"/>
+            <circle cx="200" cy="200" r="100" fill="none" stroke="rgba(255,255,255,0.1)" strokeWidth="2" strokeDasharray="8 8"/>
+            
+            {/* Floating Blog Posts */}
+            <g className="animate-float" style={{ animation: 'float 6s ease-in-out infinite' }}>
+              {/* Blog Post Card 1 */}
+              <rect x="50" y="100" width="140" height="100" rx="12" fill="white" className="drop-shadow-xl"/>
+              <circle cx="80" cy="130" r="15" fill="#0077b6" opacity="0.2"/>
+              <circle cx="80" cy="130" r="8" fill="#0077b6"/>
+              <rect x="110" y="120" width="60" height="6" rx="3" fill="#1e4b7a" opacity="0.3"/>
+              <rect x="110" y="135" width="45" height="6" rx="3" fill="#1e4b7a" opacity="0.3"/>
+              <rect x="110" y="150" width="50" height="6" rx="3" fill="#1e4b7a" opacity="0.3"/>
+              <rect x="110" y="165" width="55" height="6" rx="3" fill="#1e4b7a" opacity="0.3"/>
+            </g>
+
+            <g className="animate-float" style={{ animation: 'float 7s ease-in-out infinite 1s' }}>
+              {/* Blog Post Card 2 */}
+              <rect x="210" y="180" width="140" height="100" rx="12" fill="white" className="drop-shadow-xl"/>
+              <circle cx="240" cy="210" r="15" fill="#0077b6" opacity="0.2"/>
+              <circle cx="240" cy="210" r="8" fill="#0077b6"/>
+              <rect x="270" cy="200" width="60" height="6" rx="3" fill="#1e4b7a" opacity="0.3" y="200"/>
+              <rect x="270" y="215" width="45" height="6" rx="3" fill="#1e4b7a" opacity="0.3"/>
+              <rect x="270" y="230" width="50" height="6" rx="3" fill="#1e4b7a" opacity="0.3"/>
+              <rect x="270" y="245" width="55" height="6" rx="3" fill="#1e4b7a" opacity="0.3"/>
+            </g>
+
+            <g className="animate-float" style={{ animation: 'float 8s ease-in-out infinite 2s' }}>
+              {/* Blog Post Card 3 */}
+              <rect x="90" y="240" width="140" height="100" rx="12" fill="white" className="drop-shadow-xl"/>
+              <circle cx="120" cy="270" r="15" fill="#0077b6" opacity="0.2"/>
+              <circle cx="120" cy="270" r="8" fill="#0077b6"/>
+              <rect x="150" y="260" width="60" height="6" rx="3" fill="#1e4b7a" opacity="0.3"/>
+              <rect x="150" y="275" width="45" height="6" rx="3" fill="#1e4b7a" opacity="0.3"/>
+              <rect x="150" y="290" width="50" height="6" rx="3" fill="#1e4b7a" opacity="0.3"/>
+              <rect x="150" y="305" width="55" height="6" rx="3" fill="#1e4b7a" opacity="0.3"/>
+            </g>
+
+            {/* Central BlogSphere Icon */}
+            <g transform="translate(170, 120)">
+              <circle cx="30" cy="30" r="30" fill="white" opacity="0.2"/>
+              <circle cx="30" cy="30" r="20" fill="white" opacity="0.3"/>
+              <BookOpen x="18" y="18" width="24" height="24" color="white" className="absolute"/>
+            </g>
+
+            {/* Decorative Icons */}
+            <g className="animate-pulse">
+              <PenTool x="280" y="60" width="24" height="24" color="white" opacity="0.6"/>
+              <Users x="40" y="320" width="24" height="24" color="white" opacity="0.6"/>
+              <TrendingUp x="320" y="320" width="24" height="24" color="white" opacity="0.6"/>
+            </g>
+
+            {/* Connection Lines */}
+            <path d="M120 160 L200 200 L280 240" stroke="rgba(255,255,255,0.2)" strokeWidth="2" fill="none" strokeDasharray="6 6"/>
+            <path d="M160 280 L200 250 L320 220" stroke="rgba(255,255,255,0.2)" strokeWidth="2" fill="none" strokeDasharray="6 6"/>
+          </svg>
+
+          {/* Welcome Text */}
+          <div className="text-center mt-8 text-white">
+            <h2 className="text-2xl font-bold mb-2">Welcome to BlogSphere</h2>
+            <p className="text-white/80">Share your thoughts with the world</p>
+            
+          </div>
+        </div>
+
+        {/* Overlay gradient */}
+        <div className="absolute inset-0 bg-gradient-to-t from-[#1e4b7a]/30 to-transparent pointer-events-none"></div>
       </div>
+
+      {/* Add animation styles */}
+      <style>{`
+        @keyframes float {
+          0%, 100% { transform: translateY(0px); }
+          50% { transform: translateY(-20px); }
+        }
+        .animate-float {
+          animation: float 6s ease-in-out infinite;
+        }
+      `}</style>
     </div>
   );
 }
-

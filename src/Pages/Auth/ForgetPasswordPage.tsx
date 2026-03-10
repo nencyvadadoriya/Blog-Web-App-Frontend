@@ -45,16 +45,16 @@ export default function ForgotPassword() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 font-sans bg-gradient-to-br from-blue-50 to-indigo-100 relative overflow-hidden">
+    <div className="min-h-screen flex items-center justify-center p-4 font-sans bg-white relative overflow-hidden">
       {/* Background decorative elements */}
-      <div className="absolute top-10 left-10 w-20 h-20 bg-blue-200 rounded-full opacity-20 blur-xl"></div>
-      <div className="absolute bottom-10 right-10 w-32 h-32 bg-purple-200 rounded-full opacity-30 blur-xl"></div>
-      <div className="absolute top-1/2 right-1/4 w-16 h-16 bg-indigo-300 rounded-full opacity-40 blur-lg"></div>
-      
+      <div className="absolute top-10 left-10 w-20 h-20 bg-[#e6f0fa] rounded-full opacity-60 blur-xl"></div>
+      <div className="absolute bottom-10 right-10 w-32 h-32 bg-[#e6f0fa] rounded-full opacity-60 blur-xl"></div>
+      <div className="absolute top-1/2 right-1/4 w-16 h-16 bg-[#e6f0fa] rounded-full opacity-60 blur-lg"></div>
+
       <div className="w-full max-w-md relative z-10">
         <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-2xl overflow-hidden border border-white/50">
           {/* Header section with gradient */}
-          <div className="bg-gradient-to-r from-blue-600 to-indigo-700 p-6 text-white">
+          <div className="bg-[#0077b6] p-6 text-white">
             <div className="flex items-center justify-center mb-4">
               <div className="p-3 rounded-full bg-white/20 backdrop-blur-sm">
                 <svg
@@ -74,7 +74,7 @@ export default function ForgotPassword() {
             <h2 className="text-2xl font-bold text-center mb-2">
               Reset Your Password
             </h2>
-            <p className="text-blue-100 text-center text-sm">
+            <p className="text-white/90 text-center text-sm">
               Enter your email and we'll send you instructions to reset your password
             </p>
           </div>
@@ -113,7 +113,7 @@ export default function ForgotPassword() {
                     onChange={(event) => setEmail(event.target.value)}
                     placeholder="Enter your email address"
                     className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl 
-                      focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 
+                      focus:outline-none focus:ring-2 focus:ring-[#e6f0fa] focus:border-[#0077b6] 
                       placeholder-gray-400 transition-all duration-200 bg-white/50"
                   />
                 </div>
@@ -143,7 +143,7 @@ export default function ForgotPassword() {
               <button
                 type="submit"
                 disabled={loader}
-                className="w-full bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 
+                className="w-full bg-[#0077b6] hover:bg-[#005a8c] 
                   text-white font-semibold py-3.5 rounded-xl transition-all duration-300 shadow-lg 
                   hover:shadow-xl transform hover:scale-[1.02] active:scale-[0.98] 
                   disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none
@@ -151,10 +151,13 @@ export default function ForgotPassword() {
               >
                 <div className="absolute inset-0 bg-white/20 transform -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
                 {loader ? (
-                  <div className="flex items-center justify-center gap-2 relative z-10">
-                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                    <span>Sending Instructions...</span>
-                  </div>
+                  <span className="relative z-10 flex items-center justify-center gap-2">
+                    <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Send Reset Link
+                  </span>
                 ) : (
                   <span className="relative z-10 flex items-center justify-center gap-2">
                     <svg
@@ -181,7 +184,7 @@ export default function ForgotPassword() {
             <div className="mt-6 text-center">
               <button
                 onClick={() => navigate(-1)}
-                className="text-sm text-blue-600 hover:text-blue-800 font-medium flex items-center justify-center gap-1 mx-auto transition-colors duration-200"
+                className="text-sm text-[#0077b6] hover:text-[#005a8c] font-medium flex items-center justify-center gap-1 mx-auto transition-colors duration-200"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"

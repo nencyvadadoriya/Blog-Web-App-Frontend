@@ -82,17 +82,17 @@ export default function ChangePasswordPage() {
 
 
     return (
-        <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-purple-50 to-blue-50 relative overflow-hidden">
+        <div className="min-h-screen flex items-center justify-center p-4 bg-white relative overflow-hidden">
             {/* Background Elements */}
-            <div className="absolute top-10 left-10 w-72 h-72 bg-purple-200 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob"></div>
-            <div className="absolute top-40 right-10 w-72 h-72 bg-blue-200 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-2000"></div>
-            <div className="absolute -bottom-8 left-20 w-72 h-72 bg-indigo-200 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-4000"></div>
+            <div className="absolute top-10 left-10 w-72 h-72 bg-[#e6f0fa] rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-blob"></div>
+            <div className="absolute top-40 right-10 w-72 h-72 bg-[#e6f0fa] rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-blob animation-delay-2000"></div>
+            <div className="absolute -bottom-8 left-20 w-72 h-72 bg-[#e6f0fa] rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-blob animation-delay-4000"></div>
 
             <div className="w-full max-w-md relative z-10">
                 <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-2xl p-8 border border-white/50">
                     {/* Header */}
                     <div className="text-center mb-8">
-                        <div className="w-20 h-20 bg-gradient-to-r from-purple-500 to-blue-500 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg">
+                        <div className="w-20 h-20 bg-[#0077b6] rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg">
                             <Lock className="w-8 h-8 text-white" />
                         </div>
 
@@ -127,7 +127,7 @@ export default function ChangePasswordPage() {
                             </label>
                             <div className="relative group">
                                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <Lock className="w-5 h-5 text-gray-400 group-focus-within:text-purple-600 transition-colors" />
+                                    <Lock className="w-5 h-5 text-gray-400 group-focus-within:text-[#0077b6] transition-colors" />
                                 </div>
                                 <input
                                     type={showNewPassword ? "text" : "password"}
@@ -136,7 +136,7 @@ export default function ChangePasswordPage() {
                                     onChange={handleChange}
                                     placeholder="Enter your new password"
                                     className="w-full pl-10 pr-10 py-3.5 border border-gray-300 rounded-xl 
-                                    focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 
+                                    focus:outline-none focus:ring-2 focus:ring-[#e6f0fa] focus:border-[#0077b6] 
                                     placeholder-gray-400 transition-all duration-200 bg-white/80 shadow-sm"
                                 />
                                 <button
@@ -145,9 +145,9 @@ export default function ChangePasswordPage() {
                                     className="absolute inset-y-0 right-0 pr-3 flex items-center"
                                 >
                                     {showNewPassword ? (
-                                        <Eye className="w-5 h-5 text-gray-400 hover:text-purple-600 transition-colors" />
+                                        <Eye className="w-5 h-5 text-gray-400 hover:text-[#0077b6] transition-colors" />
                                     ) : (
-                                        <EyeOff className="w-5 h-5 text-gray-400 hover:text-purple-600 transition-colors" />
+                                        <EyeOff className="w-5 h-5 text-gray-400 hover:text-[#0077b6] transition-colors" />
                                     )}
                                 </button>
                             </div>
@@ -160,7 +160,7 @@ export default function ChangePasswordPage() {
                             </label>
                             <div className="relative group">
                                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <Lock className="w-5 h-5 text-gray-400 group-focus-within:text-purple-600 transition-colors" />
+                                    <Lock className="w-5 h-5 text-gray-400 group-focus-within:text-[#0077b6] transition-colors" />
                                 </div>
                                 <input
                                     type={showConfirmPassword ? "text" : "password"}
@@ -169,7 +169,7 @@ export default function ChangePasswordPage() {
                                     onChange={handleChange}
                                     placeholder="Confirm your new password"
                                     className="w-full pl-10 pr-10 py-3.5 border border-gray-300 rounded-xl 
-                                    focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 
+                                    focus:outline-none focus:ring-2 focus:ring-[#e6f0fa] focus:border-[#0077b6] 
                                     placeholder-gray-400 transition-all duration-200 bg-white/80 shadow-sm"
                                 />
                                 <button
@@ -178,9 +178,9 @@ export default function ChangePasswordPage() {
                                     className="absolute inset-y-0 right-0 pr-3 flex items-center"
                                 >
                                     {showConfirmPassword ? (
-                                        <EyeOff className="w-5 h-5 text-gray-400 hover:text-purple-600 transition-colors" />
+                                        <EyeOff className="w-5 h-5 text-gray-400 hover:text-[#0077b6] transition-colors" />
                                     ) : (
-                                        <Eye className="w-5 h-5 text-gray-400 hover:text-purple-600 transition-colors" />
+                                        <Eye className="w-5 h-5 text-gray-400 hover:text-[#0077b6] transition-colors" />
                                     )}
                                 </button>
                             </div>
@@ -213,7 +213,7 @@ export default function ChangePasswordPage() {
                         <button
                             type="submit"
                             disabled={loader || !isFormValid}
-                            className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 
+                            className="w-full bg-[#0077b6] hover:bg-[#005a8c] 
                                 text-white font-semibold py-3.5 rounded-xl transition-all duration-300 shadow-lg 
                                 hover:shadow-xl transform hover:scale-[1.02] active:scale-[0.98] 
                                 disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none
@@ -244,7 +244,7 @@ export default function ChangePasswordPage() {
                 </div>
             </div>
 
-            <style jsx>{`
+            <style>{`
                 @keyframes blob {
                     0% { transform: translate(0px, 0px) scale(1); }
                     33% { transform: translate(30px, -50px) scale(1.1); }

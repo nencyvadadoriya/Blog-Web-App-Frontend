@@ -1,13 +1,17 @@
 import axios from "axios";
 import type { ChangePasswordPayload, LoginBody, OtpverifyPayload, RegisterUserBody } from "../Types/Types";
 import toast from "react-hot-toast";
+
+const API_BASE_URL = (import.meta as any).env?.VITE_API_BASE_URL || "https://blog-web-app-iota.vercel.app/api/";
+
 class AuthServices {
-    authBaseUrl = "https://blog-web-app-iota.vercel.app/api/";
+    authBaseUrl = API_BASE_URL;
     authLoginUrl = "auth/login";
     authRegigsterUrl = "auth/register";
     authForgetPassword = "auth/forgetPassword";
     authVerifyOtp = "auth/verifyOtp";
     authChangePassword = "auth/changePassword";
+    authAddBlog = "blog/addBlog";
 
     async loginUser(payload: LoginBody) {
         try {
@@ -15,6 +19,11 @@ class AuthServices {
             return res.data;
         } catch (error) {
             console.log("login error", error);
+            if (axios.isAxiosError(error)) {
+                const msg = (error.response?.data as any)?.msg || (error.response?.data as any)?.message || error.message;
+                return { error: true, msg: msg || "Something went wrong. Please try again later." };
+            }
+            return { error: true, msg: "Something went wrong. Please try again later." };
         }
 
     }
@@ -36,6 +45,11 @@ class AuthServices {
             return res.data;
         } catch (error) {
             console.log("register error", error);
+            if (axios.isAxiosError(error)) {
+                const msg = (error.response?.data as any)?.msg || (error.response?.data as any)?.message || error.message;
+                return { error: true, msg: msg || "Something went wrong. Please try again later." };
+            }
+            return { error: true, msg: "Something went wrong. Please try again later." };
         }
     }
     getAuthToken() {
@@ -69,6 +83,20 @@ class AuthServices {
             
         }
     }
+    
+    async addBlog(payload : any){
+        try {
+            const formData = new FormData();
+            for (const key in payload) {
+                formData.append(key, payload[key]);
+            }
+            const res = await axios.post(this.authBaseUrl + this.authAddBlog, formData);
+            return res.data;
+        } catch (error) {
+            console.log("add blog error", error);
+        }
+    }
+
 }
 
 export const authService = new AuthServices();

@@ -5,6 +5,7 @@ import { authService } from "../../services/AuthService";
 import type { OtpverifyPayload } from "../../Types/Types";
 import toast from "react-hot-toast";
 import { Mail, Clock } from "lucide-react";
+import Skeleton from "../../Components/Skeleton/Skeleton";
 
 export default function OtpPage() {
     const [email, setEmail] = useState<string>("");
@@ -127,17 +128,17 @@ export default function OtpPage() {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-purple-50 to-blue-50 relative overflow-hidden">
+        <div className="min-h-screen flex items-center justify-center p-4 bg-white relative overflow-hidden">
             {/* Background Elements */}
-            <div className="absolute top-10 left-10 w-72 h-72 bg-purple-200 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob"></div>
-            <div className="absolute top-40 right-10 w-72 h-72 bg-blue-200 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-2000"></div>
-            <div className="absolute -bottom-8 left-20 w-72 h-72 bg-indigo-200 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-4000"></div>
+            <div className="absolute top-10 left-10 w-72 h-72 bg-[#e6f0fa] rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-blob"></div>
+            <div className="absolute top-40 right-10 w-72 h-72 bg-[#e6f0fa] rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-blob animation-delay-2000"></div>
+            <div className="absolute -bottom-8 left-20 w-72 h-72 bg-[#e6f0fa] rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-blob animation-delay-4000"></div>
 
             <div className="w-full max-w-md relative z-10">
                 <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-2xl p-8 border border-white/50">
                     {/* Header */}
                     <div className="text-center mb-8">
-                        <div className="w-20 h-20 bg-gradient-to-r from-purple-500 to-blue-500 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg">
+                        <div className="w-20 h-20 bg-[#0077b6] rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg">
                             <Mail className="w-8 h-8 text-white" />
                         </div>
 
@@ -178,7 +179,7 @@ export default function OtpPage() {
                                         onKeyDown={(e) => handleKeyDown(index, e)}
                                         onPaste={index === 0 ? handlePaste : undefined}
                                         className="w-12 h-14 text-center text-xl font-bold border-2 border-gray-300 
-                                        rounded-xl focus:border-purple-500 focus:ring-2 focus:ring-purple-200 
+                                        rounded-xl focus:border-[#0077b6] focus:ring-2 focus:ring-[#e6f0fa] 
                                         focus:outline-none transition-all duration-200 bg-white shadow-sm
                                         hover:border-gray-400"
                                     />
@@ -202,7 +203,7 @@ export default function OtpPage() {
                         <div className="text-center space-y-4">
                             <div className="flex items-center justify-center gap-2 text-sm text-gray-600">
                                 <Clock className="w-4 h-4" />
-                                <span>Code expires in 2 minitus</span>
+                                <span>Code expires in 2 minutes</span>
                             </div>
 
                             <div className="text-sm">
@@ -211,13 +212,16 @@ export default function OtpPage() {
                                         type="button"
                                         onClick={handleResend}
                                         disabled={resetLoader}
-                                        className="text-purple-600 hover:text-purple-700 font-semibold transition-colors duration-200 group disabled:opacity-50 disabled:cursor-not-allowed"
+                                        className="text-[#0077b6] hover:text-[#005a8c] font-semibold transition-colors duration-200 group disabled:opacity-50 disabled:cursor-not-allowed"
                                     >
                                         {resetLoader ? (
-                                            <div className="flex items-center justify-center gap-2">
-                                                <div className="w-4 h-4 border-2 border-purple-600 border-t-transparent rounded-full animate-spin"></div>
-                                                <span>Resending OTP...</span>
-                                            </div>
+                                            <span className="flex items-center justify-center gap-2">
+                                                <svg className="animate-spin h-4 w-4 text-[#0077b6]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                                </svg>
+                                                Resending...
+                                            </span>
                                         ) : (
                                             <span className="flex items-center gap-1">
                                                 Resend OTP
@@ -238,7 +242,7 @@ export default function OtpPage() {
                         <button
                             type="submit"
                             disabled={loader}
-                            className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 
+                            className="w-full bg-[#0077b6] hover:bg-[#005a8c] 
                                 text-white font-semibold py-3.5 rounded-xl transition-all duration-300 shadow-lg 
                                 hover:shadow-xl transform hover:scale-[1.02] active:scale-[0.98] 
                                 disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none
@@ -246,10 +250,13 @@ export default function OtpPage() {
                         >
                             <div className="absolute inset-0 bg-white/20 transform -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
                             {loader ? (
-                                <div className="flex items-center justify-center gap-2 relative z-10">
-                                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                                    <span>Verifying...</span>
-                                </div>
+                                <span className="relative z-10 flex items-center justify-center gap-2">
+                                    <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                    </svg>
+                                    Verify & Continue
+                                </span>
                             ) : (
                                 <span className="relative z-10">Verify & Continue</span>
                             )}
@@ -263,7 +270,7 @@ export default function OtpPage() {
                             <button
                                 type="button"
                                 onClick={() => navigate(routepath.ForgotPassword)}
-                                className="text-purple-600 hover:text-purple-700 font-medium"
+                                className="text-[#0077b6] hover:text-[#005a8c] font-medium"
                             >
                                 try another email
                             </button>
@@ -272,7 +279,7 @@ export default function OtpPage() {
                 </div>
             </div>
 
-            <style jsx>{`
+            <style>{`
                 @keyframes blob {
                     0% { transform: translate(0px, 0px) scale(1); }
                     33% { transform: translate(30px, -50px) scale(1.1); }

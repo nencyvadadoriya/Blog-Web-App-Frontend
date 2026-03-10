@@ -49,6 +49,7 @@ const RegisterPage = () => {
 
     setLoader(false);
   };
+  
   return (
     <div className="flex items-center justify-center w-full min-h-screen bg-gray-100 font-sans">
       <div className="w-full min-h-screen flex flex-col md:flex-row shadow-2xl rounded-2xl">
@@ -58,7 +59,7 @@ const RegisterPage = () => {
           className="relative w-full md:w-1/2 min-h-screen flex flex-col justify-center text-white px-10 py-12"
           style={{
             backgroundImage: `
-          linear-gradient(rgba(6, 70, 247, 0.85), rgba(6, 70, 247, 0.85)),
+          linear-gradient(rgba(0, 119, 182, 0.9), rgba(30, 75, 122, 0.95)),
           url('https://cdn.dribbble.com/users/1162077/screenshots/4649464/media/7ed33c54e8f17c4e05f9d5dbf7e5c8a5.png?compress=1&resize=1200x900')
         `,
             backgroundSize: 'cover',
@@ -66,8 +67,8 @@ const RegisterPage = () => {
           }}
         >
           <div className="absolute inset-0 pointer-events-none">
-            <div className="absolute top-16 left-10 w-48 h-48 bg-blue-300/10 rounded-full blur-3xl"></div>
-            <div className="absolute bottom-16 right-10 w-64 h-64 bg-blue-400/10 rounded-full blur-3xl"></div>
+            <div className="absolute top-16 left-10 w-48 h-48 bg-[#0077b6]/20 rounded-full blur-3xl"></div>
+            <div className="absolute bottom-16 right-10 w-64 h-64 bg-[#1e4b7a]/30 rounded-full blur-3xl"></div>
           </div>
 
           <div className="relative z-10 text-center md:text-left space-y-6">
@@ -100,7 +101,7 @@ const RegisterPage = () => {
 
             {/* Profile Image Upload */}
             <div className="flex flex-col items-center mb-4">
-              <label className="relative w-24 h-24 rounded-full bg-gray-100 flex items-center justify-center cursor-pointer border-2 border-dashed border-gray-300 hover:border-blue-500 transition-colors overflow-hidden">
+              <label className="relative w-24 h-24 rounded-full bg-gray-100 flex items-center justify-center cursor-pointer border-2 border-dashed border-gray-300 hover:border-[#0077b6] transition-colors overflow-hidden">
                 {previewImage ? (
                   <img
                     src={previewImage}
@@ -130,7 +131,7 @@ const RegisterPage = () => {
             {/* Name */}
             <div>
               <label className="text-xs font-semibold text-gray-600 block mb-1">FULL NAME</label>
-              <div className="flex items-center border border-gray-300 rounded-lg p-2 shadow-sm">
+              <div className="flex items-center border border-gray-300 rounded-lg p-2 shadow-sm focus-within:border-[#0077b6] focus-within:ring-1 focus-within:ring-[#0077b6]/20">
                 <User className="w-5 h-5 text-gray-400 mr-2" />
                 <input
                   type="text"
@@ -151,7 +152,7 @@ const RegisterPage = () => {
                 rows={3}
                 value={formData.about}
                 onChange={handleChange}
-                className="w-full border border-gray-300 rounded-lg p-2 text-sm resize-none shadow-sm"
+                className="w-full border border-gray-300 rounded-lg p-2 text-sm resize-none shadow-sm focus:border-[#0077b6] focus:ring-1 focus:ring-[#0077b6]/20 outline-none"
                 placeholder="Tell us something about yourself..."
               ></textarea>
             </div>
@@ -159,7 +160,7 @@ const RegisterPage = () => {
             {/* Email */}
             <div>
               <label className="text-xs font-semibold text-gray-600 block mb-1">EMAIL ADDRESS</label>
-              <div className="flex items-center border border-gray-300 rounded-lg p-2 shadow-sm">
+              <div className="flex items-center border border-gray-300 rounded-lg p-2 shadow-sm focus-within:border-[#0077b6] focus-within:ring-1 focus-within:ring-[#0077b6]/20">
                 <Mail className="w-5 h-5 text-gray-400 mr-2" />
                 <input
                   type="email"
@@ -175,7 +176,7 @@ const RegisterPage = () => {
             {/* Password */}
             <div>
               <label className="text-xs font-semibold text-gray-600 block mb-1">PASSWORD</label>
-              <div className="flex items-center border border-gray-300 rounded-lg p-2 shadow-sm">
+              <div className="flex items-center border border-gray-300 rounded-lg p-2 shadow-sm focus-within:border-[#0077b6] focus-within:ring-1 focus-within:ring-[#0077b6]/20">
                 <Lock className="w-5 h-5 text-gray-400 mr-2" />
                 <input
                   type="password"
@@ -193,14 +194,26 @@ const RegisterPage = () => {
               <label className="text-xs font-semibold text-gray-600 block mb-1">GENDER</label>
               <div className="flex items-center gap-6">
                 <label className="flex items-center gap-2 cursor-pointer">
-                  <input type="radio" name="gender" value="male"
-                    checked={formData.gender === "male"} onChange={handleChange} />
+                  <input 
+                    type="radio" 
+                    name="gender" 
+                    value="male"
+                    checked={formData.gender === "male"} 
+                    onChange={handleChange}
+                    className="text-[#0077b6] focus:ring-[#0077b6]/20"
+                  />
                   <span className="text-sm">Male</span>
                 </label>
 
                 <label className="flex items-center gap-2 cursor-pointer">
-                  <input type="radio" name="gender" value="female"
-                    checked={formData.gender === "female"} onChange={handleChange} />
+                  <input 
+                    type="radio" 
+                    name="gender" 
+                    value="female"
+                    checked={formData.gender === "female"} 
+                    onChange={handleChange}
+                    className="text-[#0077b6] focus:ring-[#0077b6]/20"
+                  />
                   <span className="text-sm">Female</span>
                 </label>
               </div>
@@ -210,22 +223,23 @@ const RegisterPage = () => {
             <button
               type="submit"
               disabled={loader}
-              className="w-full p-3 text-white font-bold rounded-lg bg-blue-600 shadow-md hover:bg-blue-700 transition"
+              className="w-full p-3 text-white font-bold rounded-lg bg-[#0077b6] shadow-md hover:bg-[#005a8c] transition-all disabled:opacity-70 disabled:cursor-not-allowed"
             >
-              Sign Up
+              {loader ? (
+                <span className="flex items-center justify-center gap-2">
+                  <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Sign Up
+                </span>
+              ) : 'Sign Up'}
             </button>
-
-            {loader && (
-              <div className="flex justify-center items-center gap-2">
-                <div className="w-5 h-5 border-2 border-gray-300 border-t-transparent rounded-full animate-spin"></div>
-                <span className="text-sm">Creating account...</span>
-              </div>
-            )}
 
             <div className="text-center">
               <p className="text-xs text-gray-600">
                 Already have an account?{' '}
-                <Link to={routepath.login} className="text-blue-600 font-bold">
+                <Link to={routepath.login} className="text-[#0077b6] font-bold hover:text-[#005a8c]">
                   Login
                 </Link>
               </p>

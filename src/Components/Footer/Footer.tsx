@@ -1,110 +1,135 @@
-import { Facebook, Twitter, Instagram, Linkedin, Mail, MapPin, Phone } from 'lucide-react';
+import { Facebook, Twitter, Instagram, Linkedin, Mail, MapPin, Phone, BookOpen, ChevronRight } from 'lucide-react';
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="bg-gray-900 text-gray-300">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-          <div>
-            <div className="flex items-center space-x-2 mb-4">
-              <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-cyan-600 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-lg">B</span>
+    <footer className="bg-gradient-to-br from-white to-blue-50 text-gray-800 border-t border-gray-200 relative overflow-hidden">
+      {/* Decorative Background Elements */}
+      <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[#0077b6] via-[#1e4b7a] to-[#0077b6]"></div>
+      <div className="absolute top-10 -left-20 w-64 h-64 bg-[#0077b6]/5 rounded-full blur-3xl"></div>
+      <div className="absolute bottom-10 -right-20 w-80 h-80 bg-[#1e4b7a]/5 rounded-full blur-3xl"></div>
+      
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 relative z-10">
+        {/* Main Footer Content */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12">
+          {/* Company Info Section */}
+          <div className="space-y-4">
+            <div className="flex items-center space-x-2 group">
+              <div className="w-10 h-10 bg-gradient-to-br from-[#0077b6] to-[#1e4b7a] rounded-xl flex items-center justify-center shadow-lg shadow-[#0077b6]/20 group-hover:shadow-xl group-hover:shadow-[#0077b6]/30 transition-all duration-300 transform group-hover:scale-110">
+                <BookOpen className="w-5 h-5 text-white fill-white/20" />
               </div>
-              <span className="text-xl font-bold text-white">BlogSpace</span>
+              <span className="text-xl font-bold bg-gradient-to-r from-[#0077b6] to-[#1e4b7a] bg-clip-text text-transparent">
+                BlogSphere
+              </span>
             </div>
-            <p className="text-sm text-gray-400 leading-relaxed">
-              Your daily source of inspiration, stories, and insights. Join our community of readers and writers.
+            <p className="text-sm text-gray-600 leading-relaxed">
+              Your daily source of inspiration, stories, and insights. Join our community of passionate readers and writers.
             </p>
-            <div className="flex space-x-4 mt-6">
-              <a href="#" className="w-9 h-9 bg-gray-800 rounded-full flex items-center justify-center hover:bg-blue-600 transition-colors">
+            
+          
+
+            {/* Social Links */}
+            <div className="flex space-x-3 pt-2">
+              <a href="#" className="w-9 h-9 bg-white border border-gray-200 rounded-full flex items-center justify-center text-[#0077b6] hover:bg-[#0077b6] hover:text-white hover:border-[#0077b6] transition-all duration-300 shadow-sm hover:shadow-md">
                 <Facebook className="w-4 h-4" />
               </a>
-              <a href="#" className="w-9 h-9 bg-gray-800 rounded-full flex items-center justify-center hover:bg-blue-600 transition-colors">
+              <a href="#" className="w-9 h-9 bg-white border border-gray-200 rounded-full flex items-center justify-center text-[#0077b6] hover:bg-[#0077b6] hover:text-white hover:border-[#0077b6] transition-all duration-300 shadow-sm hover:shadow-md">
                 <Twitter className="w-4 h-4" />
               </a>
-              <a href="#" className="w-9 h-9 bg-gray-800 rounded-full flex items-center justify-center hover:bg-blue-600 transition-colors">
+              <a href="#" className="w-9 h-9 bg-white border border-gray-200 rounded-full flex items-center justify-center text-[#0077b6] hover:bg-[#0077b6] hover:text-white hover:border-[#0077b6] transition-all duration-300 shadow-sm hover:shadow-md">
                 <Instagram className="w-4 h-4" />
               </a>
-              <a href="#" className="w-9 h-9 bg-gray-800 rounded-full flex items-center justify-center hover:bg-blue-600 transition-colors">
+              <a href="#" className="w-9 h-9 bg-white border border-gray-200 rounded-full flex items-center justify-center text-[#0077b6] hover:bg-[#0077b6] hover:text-white hover:border-[#0077b6] transition-all duration-300 shadow-sm hover:shadow-md">
                 <Linkedin className="w-4 h-4" />
               </a>
             </div>
           </div>
 
+          {/* Quick Links Section */}
           <div>
-            <h3 className="text-white font-semibold mb-4 text-lg">Quick Links</h3>
+            <h3 className="text-gray-900 font-semibold mb-4 text-lg relative inline-block">
+              Quick Links
+              <span className="absolute bottom-0 left-0 w-12 h-0.5 bg-gradient-to-r from-[#0077b6] to-[#1e4b7a]"></span>
+            </h3>
             <ul className="space-y-3">
-              <li>
-                <a href="/" className="text-sm hover:text-blue-400 transition-colors">Home</a>
-              </li>
-              <li>
-                <a href="/articles" className="text-sm hover:text-blue-400 transition-colors">Articles</a>
-              </li>
-              <li>
-                <a href="/categories" className="text-sm hover:text-blue-400 transition-colors">Categories</a>
-              </li>
-              <li>
-                <a href="/about" className="text-sm hover:text-blue-400 transition-colors">About Us</a>
-              </li>
-              <li>
-                <a href="/contact" className="text-sm hover:text-blue-400 transition-colors">Contact</a>
-              </li>
+              {['Home', 'Articles', 'About Us', 'Contact'].map((item, index) => (
+                <li key={index}>
+                  <a 
+                    href={`/${item.toLowerCase().replace(' ', '-')}`} 
+                    className="text-sm text-gray-600 hover:text-[#0077b6] transition-all duration-300 flex items-center group"
+                  >
+                    <ChevronRight className="w-3 h-3 text-[#0077b6] opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all duration-300 mr-0 group-hover:mr-1" />
+                    <span>{item}</span>
+                  </a>
+                </li>
+              ))}
             </ul>
           </div>
 
+          {/* Categories Section */}
           <div>
-            <h3 className="text-white font-semibold mb-4 text-lg">Categories</h3>
+            <h3 className="text-gray-900 font-semibold mb-4 text-lg relative inline-block">
+              Categories
+              <span className="absolute bottom-0 left-0 w-12 h-0.5 bg-gradient-to-r from-[#0077b6] to-[#1e4b7a]"></span>
+            </h3>
             <ul className="space-y-3">
-              <li>
-                <a href="/category/technology" className="text-sm hover:text-blue-400 transition-colors">Technology</a>
-              </li>
-              <li>
-                <a href="/category/lifestyle" className="text-sm hover:text-blue-400 transition-colors">Lifestyle</a>
-              </li>
-              <li>
-                <a href="/category/business" className="text-sm hover:text-blue-400 transition-colors">Business</a>
-              </li>
-              <li>
-                <a href="/category/travel" className="text-sm hover:text-blue-400 transition-colors">Travel</a>
-              </li>
-              <li>
-                <a href="/category/health" className="text-sm hover:text-blue-400 transition-colors">Health</a>
-              </li>
+              {['Technology', 'Lifestyle', 'Business', 'Travel'].map((category, index) => (
+                <li key={index}>
+                  <a 
+                    href={`/category/${category.toLowerCase()}`} 
+                    className="text-sm text-gray-600 hover:text-[#0077b6] transition-all duration-300 flex items-center group"
+                  >
+                    <ChevronRight className="w-3 h-3 text-[#0077b6] opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all duration-300 mr-0 group-hover:mr-1" />
+                    <span>{category}</span>
+                  </a>
+                </li>
+              ))}
             </ul>
           </div>
 
+          {/* Contact Info Section */}
           <div>
-            <h3 className="text-white font-semibold mb-4 text-lg">Contact Info</h3>
-            <ul className="space-y-3">
-              <li className="flex items-start space-x-3">
-                <MapPin className="w-5 h-5 text-blue-400 flex-shrink-0 mt-0.5" />
-                <span className="text-sm">123 Blog Street, Digital City, DC 12345</span>
+            <h3 className="text-gray-900 font-semibold mb-4 text-lg relative inline-block">
+              Contact Info
+              <span className="absolute bottom-0 left-0 w-12 h-0.5 bg-gradient-to-r from-[#0077b6] to-[#1e4b7a]"></span>
+            </h3>
+            <ul className="space-y-4">
+              <li className="flex items-start space-x-3 group">
+                <div className="p-2 bg-[#0077b6]/10 rounded-lg group-hover:bg-[#0077b6] transition-colors duration-300">
+                  <MapPin className="w-4 h-4 text-[#0077b6] group-hover:text-white transition-colors duration-300" />
+                </div>
+                <span className="text-sm text-gray-600">123 Blog Street, Digital City, DC 12345</span>
               </li>
-              <li className="flex items-center space-x-3">
-                <Phone className="w-5 h-5 text-blue-400 flex-shrink-0" />
-                <span className="text-sm">+1 (555) 123-4567</span>
+              <li className="flex items-center space-x-3 group">
+                <div className="p-2 bg-[#0077b6]/10 rounded-lg group-hover:bg-[#0077b6] transition-colors duration-300">
+                  <Phone className="w-4 h-4 text-[#0077b6] group-hover:text-white transition-colors duration-300" />
+                </div>
+                <span className="text-sm text-gray-600">+1 (555) 123-4567</span>
               </li>
-              <li className="flex items-center space-x-3">
-                <Mail className="w-5 h-5 text-blue-400 flex-shrink-0" />
-                <span className="text-sm">info@blogspace.com</span>
+              <li className="flex items-center space-x-3 group">
+                <div className="p-2 bg-[#0077b6]/10 rounded-lg group-hover:bg-[#0077b6] transition-colors duration-300">
+                  <Mail className="w-4 h-4 text-[#0077b6] group-hover:text-white transition-colors duration-300" />
+                </div>
+                <span className="text-sm text-gray-600">info@blogsphere.com</span>
               </li>
             </ul>
           </div>
         </div>
 
-        <div className="border-t border-gray-800 mt-12 pt-8">
+        {/* Bottom Bar */}
+        <div className="mt-12 pt-8 border-t border-gray-200">
           <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
-            <p className="text-sm text-gray-400">
-              © {currentYear} BlogSpace. All rights reserved.
-            </p>
-            <div className="flex space-x-6">
-              <a href="/privacy" className="text-sm hover:text-blue-400 transition-colors">Privacy Policy</a>
-              <a href="/terms" className="text-sm hover:text-blue-400 transition-colors">Terms of Service</a>
-              <a href="/cookies" className="text-sm hover:text-blue-400 transition-colors">Cookie Policy</a>
+            <p className="text-sm text-gray-500">
+  © {currentYear} BlogSphere. Crafted with <span className="bg-gradient-to-r from-[#0077b6] to-[#1e4b7a] bg-clip-text text-transparent">❤</span> for readers worldwide.
+</p>
+            <div className="flex space-x-8">
+              <a href="#" className="text-sm text-gray-500 hover:text-[#0077b6] transition-colors">Privacy Policy</a>
+              <a href="#" className="text-sm text-gray-500 hover:text-[#0077b6] transition-colors">Terms of Service</a>
+              <a href="#" className="text-sm text-gray-500 hover:text-[#0077b6] transition-colors">Cookie Policy</a>
             </div>
           </div>
+          
         </div>
       </div>
     </footer>
