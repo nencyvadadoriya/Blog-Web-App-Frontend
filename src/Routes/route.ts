@@ -110,5 +110,5 @@ export const route = createBrowserRouter([
                 Component: ProfilePage
             }
         ]
-    }
+    }   
 ])
