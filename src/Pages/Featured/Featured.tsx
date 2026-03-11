@@ -10,7 +10,7 @@
   X,
 } from "lucide-react";
 import { useEffect, useState } from "react";
-import toast from "react-hot-toast/headless";
+import toast from 'react-hot-toast';
 import { useNavigate } from "react-router";
 import { routepath } from "../../Routes/route";
 import { blogService } from "../../services/BlogServices";
@@ -143,17 +143,12 @@ export default function Featured({ isSidebarCollapsed = false }: FeaturedProps) 
       const nav = navigator as any;
       if (nav?.share) {
         await nav.share({ title: 'Blog', url: link });
-        toast.success('Shared');
+        toast.success('Shared successfully!');
         return;
       }
-
-      if (navigator.clipboard?.writeText) {
-        await navigator.clipboard.writeText(link);
-        toast.success('Link copied');
-        return;
-      }
-
-      window.prompt('Copy this link:', link);
+      
+      await navigator.clipboard.writeText(link);
+      toast.success('Link copied to clipboard!');
     } catch (e) {
       console.error(e);
       toast.error('Share failed');

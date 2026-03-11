@@ -1,19 +1,50 @@
 import { useEffect, useMemo, useState, useRef } from 'react';
-import { Heart, MessageSquare, FileText, User, Edit3, Camera, X, Check } from 'lucide-react';
+import { useNavigate, useLocation } from 'react-router';
+import { routepath } from '../../Routes/route';
+import { Heart, MessageSquare, FileText, User, Edit3, Camera, X, Check, ArrowLeft } from 'lucide-react';
 import Header from '../../Components/Header/Header';
 import Sidebar from '../../Components/Sidebar/Sidebar';
 import Footer from '../../Components/Footer/Footer';
 import { blogService } from '../../services/BlogServices';
 import type { Blog, User as UserType, Comment } from '../../Types/Types';
-import toast from 'react-hot-toast/headless';
+import toast from 'react-hot-toast';
 
 export default function ProfilePage() {
+  const navigate = useNavigate();
+  const location = useLocation();
   const [user, setUser] = useState<UserType | null>(null);
   const [myBlogs, setMyBlogs] = useState<Blog[]>([]);
   const [followers, setFollowers] = useState<UserType[]>([]);
   const [following, setFollowing] = useState<UserType[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-  const [activeTab, setActiveTab] = useState<'posts' | 'likes' | 'comments'>('posts');
+  const [activeTab, setActiveTab] = useState<'posts' | 'likes' | 'comments' | 'inbox'>(
+    (location.state as any)?.activeTab || 'posts'
+  );
+
+  useEffect(() => {
+    if ((location.state as any)?.activeTab) {
+      setActiveTab((location.state as any).activeTab);
+    }
+  }, [location.state]);
+  const [shareInbox, setShareInbox] = useState<any[]>([]);
+  const [isInboxLoading, setIsInboxLoading] = useState(false);
+
+  useEffect(() => {
+    const loadInbox = async () => {
+      if (activeTab === 'inbox') {
+        setIsInboxLoading(true);
+        try {
+          const res = await blogService.getShareInbox();
+          setShareInbox(res?.result || res?.data || []);
+        } catch (e) {
+          console.error('Failed to load inbox', e);
+        } finally {
+          setIsInboxLoading(false);
+        }
+      }
+    };
+    loadInbox();
+  }, [activeTab]);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(() => {
     const saved = localStorage.getItem('sidebarCollapsed');
     return saved ? JSON.parse(saved) : true;
@@ -394,54 +425,46 @@ export default function ProfilePage() {
           <div className={`pb-8 ${isSidebarCollapsed ? 'pl-8 pr-4 sm:pl-10 sm:pr-6 lg:pl-12 lg:pr-8' : 'pl-6 pr-4 sm:pl-8 sm:pr-6 lg:pl-10 lg:pr-8'}`}>
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
               {/* Tab Navigation */}
-              <div className="flex border-b border-gray-200 bg-gray-50">
+              <div className="flex border-b border-gray-200">
                 <button
                   onClick={() => setActiveTab('posts')}
-                  className={`flex-1 px-6 py-4 font-medium transition-colors relative ${
-                    activeTab === 'posts'
-                      ? 'text-[#0077b6] bg-white'
-                      : 'text-gray-600 hover:text-gray-900 hover:bg-white'
-                  }`}
+                  className={`flex-1 py-4 text-sm font-semibold transition-colors relative ${activeTab === 'posts' ? 'text-[#0077b6]' : 'text-gray-500 hover:text-gray-700'}`}
                 >
-                  <span className="flex items-center justify-center gap-2">
-                    <FileText className="w-5 h-5" />
+                  <div className="flex items-center justify-center gap-2">
+                    <FileText className="w-4 h-4" />
                     My Posts
-                  </span>
-                  {activeTab === 'posts' && (
-                    <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#0077b6]"></div>
-                  )}
+                  </div>
+                  {activeTab === 'posts' && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#0077b6]" />}
                 </button>
                 <button
                   onClick={() => setActiveTab('likes')}
-                  className={`flex-1 px-6 py-4 font-medium transition-colors relative ${
-                    activeTab === 'likes'
-                      ? 'text-[#0077b6] bg-white'
-                      : 'text-gray-600 hover:text-gray-900 hover:bg-white'
-                  }`}
+                  className={`flex-1 py-4 text-sm font-semibold transition-colors relative ${activeTab === 'likes' ? 'text-[#0077b6]' : 'text-gray-500 hover:text-gray-700'}`}
                 >
-                  <span className="flex items-center justify-center gap-2">
-                    <Heart className="w-5 h-5" />
+                  <div className="flex items-center justify-center gap-2">
+                    <Heart className="w-4 h-4" />
                     Liked Posts
-                  </span>
-                  {activeTab === 'likes' && (
-                    <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#0077b6]"></div>
-                  )}
+                  </div>
+                  {activeTab === 'likes' && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#0077b6]" />}
                 </button>
                 <button
                   onClick={() => setActiveTab('comments')}
-                  className={`flex-1 px-6 py-4 font-medium transition-colors relative ${
-                    activeTab === 'comments'
-                      ? 'text-[#0077b6] bg-white'
-                      : 'text-gray-600 hover:text-gray-900 hover:bg-white'
-                  }`}
+                  className={`flex-1 py-4 text-sm font-semibold transition-colors relative ${activeTab === 'comments' ? 'text-[#0077b6]' : 'text-gray-500 hover:text-gray-700'}`}
                 >
-                  <span className="flex items-center justify-center gap-2">
-                    <MessageSquare className="w-5 h-5" />
+                  <div className="flex items-center justify-center gap-2">
+                    <MessageSquare className="w-4 h-4" />
                     Comments
-                  </span>
-                  {activeTab === 'comments' && (
-                    <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#0077b6]"></div>
-                  )}
+                  </div>
+                  {activeTab === 'comments' && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#0077b6]" />}
+                </button>
+                <button
+                  onClick={() => setActiveTab('inbox')}
+                  className={`flex-1 py-4 text-sm font-semibold transition-colors relative ${activeTab === 'inbox' ? 'text-[#0077b6]' : 'text-gray-500 hover:text-gray-700'}`}
+                >
+                  <div className="flex items-center justify-center gap-2">
+                    <MessageSquare className="w-4 h-4" />
+                    Inbox
+                  </div>
+                  {activeTab === 'inbox' && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#0077b6]" />}
                 </button>
               </div>
 
@@ -521,14 +544,12 @@ export default function ProfilePage() {
 
                     {activeTab === 'comments' && (
                       <div className="space-y-6">
-                        <h2 className="text-2xl font-bold text-gray-900 mb-6">💬 Comments on My Posts</h2>
                         {stats.allComments.length === 0 ? (
-                          <div className="text-center py-16">
-                            <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                              <MessageSquare className="w-12 h-12 text-gray-400" />
+                          <div className="py-20 text-center">
+                            <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                              <MessageSquare className="w-10 h-10 text-gray-300" />
                             </div>
-                            <h3 className="text-xl font-semibold text-gray-700 mb-2">No comments yet</h3>
-                            <p className="text-gray-500">Create engaging content to get comments!</p>
+                            <p className="text-gray-500 font-medium">No comments yet</p>
                           </div>
                         ) : (
                           <div className="grid gap-6">
@@ -549,6 +570,99 @@ export default function ProfilePage() {
                                 </div>
                               </div>
                             ))}
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    {activeTab === 'inbox' && (
+                      <div className="space-y-4">
+                        <div className="flex items-center justify-between mb-6">
+                          <h3 className="text-xl font-bold text-gray-900">Shared with me</h3>
+                          <span className="px-3 py-1 bg-blue-100 text-blue-600 rounded-full text-xs font-semibold">
+                            {shareInbox.length} Messages
+                          </span>
+                        </div>
+
+                        {isInboxLoading ? (
+                          <div className="space-y-4">
+                            {[1, 2, 3].map((i) => (
+                              <div key={i} className="h-24 rounded-2xl bg-gray-100 animate-pulse" />
+                            ))}
+                          </div>
+                        ) : shareInbox.length === 0 ? (
+                          <div className="py-20 text-center">
+                            <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                              <MessageSquare className="w-10 h-10 text-gray-300" />
+                            </div>
+                            <p className="text-gray-500 font-medium">No shared blogs yet</p>
+                            <p className="text-sm text-gray-400 mt-1">When someone shares a blog with you, it will appear here.</p>
+                          </div>
+                        ) : (
+                          <div className="grid gap-4">
+                            {shareInbox.map((item: any, index: number) => {
+                              const blogId = item.blogId?._id || item.blogId;
+                              return (
+                                <div 
+                                  key={index} 
+                                  onClick={() => navigate(`${routepath.blogDetails}/${blogId}`)}
+                                  className="group bg-white border border-gray-100 rounded-2xl p-4 hover:shadow-md transition-all cursor-pointer flex items-center gap-4 relative overflow-hidden"
+                                >
+                                  {/* Left side: Sender Image */}
+                                  <div className="relative shrink-0">
+                                    {item.fromUserId?.profile_image ? (
+                                      <img 
+                                        src={item.fromUserId.profile_image} 
+                                        className="w-14 h-14 rounded-full object-cover border-2 border-white shadow-sm" 
+                                        alt={item.fromUserId.name} 
+                                      />
+                                    ) : (
+                                      <div className="w-14 h-14 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 text-white flex items-center justify-center font-bold text-xl shadow-sm">
+                                        {(item.fromUserId?.name || 'U')[0].toUpperCase()}
+                                      </div>
+                                    )}
+                                    <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-green-500 border-2 border-white rounded-full"></div>
+                                  </div>
+
+                                  {/* Middle: Content */}
+                                  <div className="flex-1 min-w-0">
+                                    <div className="flex items-center justify-between mb-1">
+                                      <h4 className="font-bold text-gray-900 truncate">
+                                        {item.fromUserId?.name || 'Someone'} shared a blog
+                                      </h4>
+                                      <span className="text-[11px] text-gray-400 font-medium shrink-0">
+                                        {item.create_at}
+                                      </span>
+                                    </div>
+                                    
+                                    <div className="flex items-center gap-3 bg-gray-50 p-2 rounded-xl group-hover:bg-blue-50 transition-colors">
+                                      {item.blogId?.thumbnail && (
+                                        <img 
+                                          src={item.blogId.thumbnail} 
+                                          className="w-10 h-10 rounded-lg object-cover shrink-0" 
+                                          alt="thumbnail"
+                                        />
+                                      )}
+                                      <div className="min-w-0">
+                                        <p className="text-sm font-semibold text-gray-800 truncate">
+                                          {item.blogId?.title || 'View Blog'}
+                                        </p>
+                                        <p className="text-xs text-gray-500 truncate italic">
+                                          "Hey, check out this interesting blog!"
+                                        </p>
+                                      </div>
+                                    </div>
+                                  </div>
+
+                                  {/* Right side: Action */}
+                                  <div className="shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center">
+                                      <ArrowLeft className="w-4 h-4 rotate-180" />
+                                    </div>
+                                  </div>
+                                </div>
+                              );
+                            })}
                           </div>
                         )}
                       </div>

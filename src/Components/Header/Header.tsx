@@ -1,10 +1,10 @@
-import { Search } from 'lucide-react';
+import { Search, Bell } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { blogService } from '../../services/BlogServices';
 import type { User as UserType } from '../../Types/Types';
 import Skeleton from '../Skeleton/Skeleton';
-import toast from 'react-hot-toast/headless';
+import toast from 'react-hot-toast';
 
 type HeaderProps = {
   isSidebarCollapsed?: boolean;
@@ -18,7 +18,87 @@ export default function Header({ isSidebarCollapsed = false }: HeaderProps) {
   const [isSearchOpen, setIsSearchOpen] = useState<boolean>(false);
   const [isSearchLoading, setIsSearchLoading] = useState<boolean>(false);
   const [searchUsers, setSearchUsers] = useState<UserType[]>([]);
+  const [lastCheckedInbox, setLastCheckedInbox] = useState<string | null>(localStorage.getItem('lastCheckedInbox'));
   const navigate = useNavigate();
+
+  // Notification Polling for Shared Blogs
+  useEffect(() => {
+    const checkInbox = async () => {
+      try {
+        const res = await blogService.getShareInbox();
+        const inbox = res?.result || res?.data || [];
+
+        if (inbox.length > 0) {
+          const newestMessage = inbox[0];
+          const newestMessageId = newestMessage._id || newestMessage.create_at;
+
+          // If we have a new message that wasn't the last one we saw
+          if (newestMessageId !== lastCheckedInbox) {
+            setLastCheckedInbox(newestMessageId);
+            localStorage.setItem('lastCheckedInbox', newestMessageId);
+
+            // Show toast notification
+            toast.custom((t) => (
+              <div
+                className={`${t.visible ? 'animate-enter' : 'animate-leave'
+                  } max-w-md w-full bg-white shadow-lg rounded-2xl pointer-events-auto flex ring-1 ring-black ring-opacity-5 cursor-pointer`}
+                onClick={() => {
+                  toast.dismiss(t.id);
+                  navigate('/profile', { state: { activeTab: 'inbox' } });
+                }}
+              >
+                <div className="flex-1 w-0 p-4">
+                  <div className="flex items-start">
+                    <div className="flex-shrink-0 pt-0.5">
+                      {newestMessage.fromUserId?.profile_image ? (
+                        <img
+                          className="h-10 w-10 rounded-full"
+                          src={newestMessage.fromUserId.profile_image}
+                          alt=""
+                        />
+                      ) : (
+                        <div className="h-10 w-10 rounded-full bg-blue-500 flex items-center justify-center text-white font-bold">
+                          {(newestMessage.fromUserId?.name || 'U')[0].toUpperCase()}
+                        </div>
+                      )}
+                    </div>
+                    <div className="ml-3 flex-1">
+                      <p className="text-sm font-medium text-gray-900">
+                        {newestMessage.fromUserId?.name || 'Someone'} shared a blog
+                      </p>
+                      <p className="mt-1 text-sm text-gray-500 truncate">
+                        {newestMessage.blogId?.title || 'Check out this interesting blog!'}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                <div className="flex border-l border-gray-200">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      toast.dismiss(t.id);
+                    }}
+                    className="w-full border border-transparent rounded-none rounded-r-lg p-4 flex items-center justify-center text-sm font-medium text-blue-600 hover:text-blue-500 focus:outline-none"
+                  >
+                    Close
+                  </button>
+                </div>
+              </div>
+            ), { duration: 5000 });
+          }
+        }
+      } catch (e) {
+        console.error('Error checking inbox:', e);
+      }
+    };
+
+    // Initial check
+    checkInbox();
+
+    // Poll every 30 seconds
+    const interval = setInterval(checkInbox, 30000);
+    return () => clearInterval(interval);
+  }, [lastCheckedInbox, navigate]);
 
   const handleLogout = () => {
     localStorage.removeItem('token');
@@ -152,8 +232,8 @@ export default function Header({ isSidebarCollapsed = false }: HeaderProps) {
                 ) : (
                   <div className="max-h-80 overflow-auto">
                     {searchUsers.map((u) => (
-                      <div 
-                        key={u._id} 
+                      <div
+                        key={u._id}
                         className="flex items-center justify-between gap-3 px-4 py-3 border-b last:border-b-0 hover:bg-gray-50 cursor-pointer"
                         onClick={() => {
                           navigate(`/user/${u._id}`, { state: { user: u, isFollowing: !!u.isFollowing } });
@@ -183,8 +263,8 @@ export default function Header({ isSidebarCollapsed = false }: HeaderProps) {
                             handleFollowToggle(u);
                           }}
                           className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-colors ${u.isFollowing
-                              ? 'bg-gray-100 text-gray-800 hover:bg-gray-200'
-                              : 'bg-[#0077b6] text-white hover:bg-[#005a8c]'
+                            ? 'bg-gray-100 text-gray-800 hover:bg-gray-200'
+                            : 'bg-[#0077b6] text-white hover:bg-[#005a8c]'
                             }`}
                         >
                           {u.isFollowing ? 'Following' : 'Follow'}
@@ -199,7 +279,17 @@ export default function Header({ isSidebarCollapsed = false }: HeaderProps) {
 
           {/* Actions */}
           <div className="hidden md:flex items-center space-x-4 shrink-0">
-
+            {/* Notification Bell */}
+            <button
+              type="button"
+              onClick={() => navigate('/profile', { state: { activeTab: 'inbox' } })}
+              className="relative p-2 text-gray-500 hover:text-[#0077b6] hover:bg-gray-50 rounded-xl transition-colors"
+            >
+              <Bell className="w-6 h-6" />
+              {lastCheckedInbox && (
+                <span className="absolute top-2 right-2 w-2.5 h-2.5 bg-red-500 border-2 border-white rounded-full"></span>
+              )}
+            </button>
 
             <button
               type="button"
@@ -223,7 +313,7 @@ export default function Header({ isSidebarCollapsed = false }: HeaderProps) {
                 <div className="text-sm font-semibold text-gray-900 leading-5 truncate max-w-[220px]">
                   {isUserLoading ? <Skeleton className="h-4 w-28" /> : user?.name}
                 </div>
-                
+
               </div>
             </button>
           </div>
