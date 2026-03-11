@@ -1,11 +1,11 @@
-import { EyeOff, Mail, Lock, BookOpen, Eye, PenTool, Users, TrendingUp } from "lucide-react";
+import { EyeOff, Mail, Lock, BookOpen, Eye } from "lucide-react";
 import { Link, useNavigate } from "react-router";
 import { useState } from "react";
 import type { LoginBody } from "../../Types/Types";
 import toast from "react-hot-toast";
 import { authService } from "../../services/AuthService";
 import { routepath } from "../../Routes/route";
-import { getAuth, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import { getAuth, GoogleAuthProvider, signInWithPopup, GithubAuthProvider } from "firebase/auth";
 import { app } from "../../firebase/firebase";
 
 export default function LoginPage() {
@@ -13,10 +13,13 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const auth = getAuth(app);
   const googleAuthProvider = new GoogleAuthProvider();
-  const handleLoginWithGoogle = (event: any) => {
+  googleAuthProvider.setCustomParameters({ prompt: 'select_account' });
+  const githubAuthProvider = new GithubAuthProvider();
+  githubAuthProvider.setCustomParameters({ prompt: 'select_account' });
+  const handleLoginWithGoogle = async (event: any) => {
     event.preventDefault();
-
-    signInWithPopup(auth, googleAuthProvider).then(result => {
+    try {
+      const result = await signInWithPopup(auth, googleAuthProvider);
       const credential = GoogleAuthProvider.credentialFromResult(result);
       const token = credential!.accessToken;
       localStorage.setItem('token', token!);
@@ -30,10 +33,44 @@ export default function LoginPage() {
         })
       );
       navigate(routepath.HomePage, { replace: true });
-    }).catch(error => {
-      console.log("Error Code : ", error.code);
-      toast.error(error.message);
-    });
+    } catch (error: any) {
+      if (error.code === "auth/account-exists-with-different-credential") {
+        alert("This email is already used with GitHub login. Please login with GitHub instead.");
+      } else if (error.code === "auth/popup-blocked") {
+        alert("Popup was blocked. Please allow popups for this site.");
+      } else {
+        console.log("Google Error Code : ", error.code);
+        toast.error(error.message);
+      }
+    }
+  }
+  const handleLoginWithGithub = async (event: any) => {
+    event.preventDefault();
+    try {
+      const result = await signInWithPopup(auth, githubAuthProvider);
+      const credential = GithubAuthProvider.credentialFromResult(result);
+      const token = credential!.accessToken;
+      localStorage.setItem('token', token!);
+      const githubUser = result.user;
+      localStorage.setItem(
+        'user',
+        JSON.stringify({
+          name: githubUser.displayName || '',
+          email: githubUser.email || '',
+          profile_image: githubUser.photoURL || ''
+        })
+      );
+      navigate(routepath.HomePage, { replace: true });
+    } catch (error: any) {
+      if (error.code === "auth/account-exists-with-different-credential") {
+        alert("This email is already used with Google login. Please login with Google instead.");
+      } else if (error.code === "auth/popup-blocked") {
+        alert("Popup was blocked. Please allow popups for this site.");
+      } else {
+        console.log("GitHub Error Code : ", error.code);
+        toast.error(error.message);
+      }
+    }
   }
   const [loginData, setLoginData] = useState<LoginBody>({
     email: "",
@@ -136,7 +173,7 @@ export default function LoginPage() {
   return (
     <div className="w-full h-screen flex font-sans overflow-hidden bg-gray-100">
       {/* Left Side (Login Form) */}
-      <div className="w-full lg:w-1/2 h-full bg-white flex items-center justify-center p-6 lg:p-12">
+      <div className="w-full  h-full bg-white flex items-center justify-center p-6 lg:p-12">
         <div className="max-w-md w-full">
           {/* Logo */}
           <div className="flex items-center gap-3 mb-5">
@@ -181,11 +218,14 @@ export default function LoginPage() {
               Google
             </button>
 
-            <button className="flex items-center justify-center gap-2 px-3 py-2 border-2 border-gray-200 rounded-xl font-semibold text-gray-700 hover:border-[#0077b6] hover:bg-[#f0f7ff] transition-all duration-200 text-xs">
-              <svg className="w-4 h-4" fill="#1877F2" viewBox="0 0 24 24">
-                <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
+            <button
+              onClick={handleLoginWithGithub}
+              className="flex items-center justify-center gap-2 px-3 py-2 border-2 border-gray-200 rounded-xl font-semibold text-gray-700 hover:border-[#0077b6] hover:bg-[#f0f7ff] transition-all duration-200 text-xs"
+            >
+              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" />
               </svg>
-              Facebook
+              GitHub
             </button>
           </div>
 
@@ -317,85 +357,7 @@ export default function LoginPage() {
         </div>
       </div>
 
-      {/* Right Side - SVG Design with Theme Colors */}
-      <div className="hidden lg:flex w-1/2 h-full bg-gradient-to-br from-[#0077b6] to-[#1e4b7a] items-center justify-center relative overflow-hidden">
-        {/* Animated Background Circles */}
-        <div className="absolute top-0 left-0 w-96 h-96 bg-white/5 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute bottom-0 right-0 w-96 h-96 bg-white/5 rounded-full blur-3xl animate-pulse delay-1000"></div>
-        
-        {/* Main SVG Content */}
-        <div className="relative z-10 w-full max-w-lg px-8">
-          {/* Blogging Illustration SVG */}
-          <svg viewBox="0 0 400 400" className="w-full h-auto">
-            {/* Background decorative elements */}
-            <circle cx="200" cy="200" r="180" fill="none" stroke="rgba(255,255,255,0.1)" strokeWidth="2" strokeDasharray="8 8"/>
-            <circle cx="200" cy="200" r="140" fill="none" stroke="rgba(255,255,255,0.1)" strokeWidth="2" strokeDasharray="8 8"/>
-            <circle cx="200" cy="200" r="100" fill="none" stroke="rgba(255,255,255,0.1)" strokeWidth="2" strokeDasharray="8 8"/>
-            
-            {/* Floating Blog Posts */}
-            <g className="animate-float" style={{ animation: 'float 6s ease-in-out infinite' }}>
-              {/* Blog Post Card 1 */}
-              <rect x="50" y="100" width="140" height="100" rx="12" fill="white" className="drop-shadow-xl"/>
-              <circle cx="80" cy="130" r="15" fill="#0077b6" opacity="0.2"/>
-              <circle cx="80" cy="130" r="8" fill="#0077b6"/>
-              <rect x="110" y="120" width="60" height="6" rx="3" fill="#1e4b7a" opacity="0.3"/>
-              <rect x="110" y="135" width="45" height="6" rx="3" fill="#1e4b7a" opacity="0.3"/>
-              <rect x="110" y="150" width="50" height="6" rx="3" fill="#1e4b7a" opacity="0.3"/>
-              <rect x="110" y="165" width="55" height="6" rx="3" fill="#1e4b7a" opacity="0.3"/>
-            </g>
 
-            <g className="animate-float" style={{ animation: 'float 7s ease-in-out infinite 1s' }}>
-              {/* Blog Post Card 2 */}
-              <rect x="210" y="180" width="140" height="100" rx="12" fill="white" className="drop-shadow-xl"/>
-              <circle cx="240" cy="210" r="15" fill="#0077b6" opacity="0.2"/>
-              <circle cx="240" cy="210" r="8" fill="#0077b6"/>
-              <rect x="270" cy="200" width="60" height="6" rx="3" fill="#1e4b7a" opacity="0.3" y="200"/>
-              <rect x="270" y="215" width="45" height="6" rx="3" fill="#1e4b7a" opacity="0.3"/>
-              <rect x="270" y="230" width="50" height="6" rx="3" fill="#1e4b7a" opacity="0.3"/>
-              <rect x="270" y="245" width="55" height="6" rx="3" fill="#1e4b7a" opacity="0.3"/>
-            </g>
-
-            <g className="animate-float" style={{ animation: 'float 8s ease-in-out infinite 2s' }}>
-              {/* Blog Post Card 3 */}
-              <rect x="90" y="240" width="140" height="100" rx="12" fill="white" className="drop-shadow-xl"/>
-              <circle cx="120" cy="270" r="15" fill="#0077b6" opacity="0.2"/>
-              <circle cx="120" cy="270" r="8" fill="#0077b6"/>
-              <rect x="150" y="260" width="60" height="6" rx="3" fill="#1e4b7a" opacity="0.3"/>
-              <rect x="150" y="275" width="45" height="6" rx="3" fill="#1e4b7a" opacity="0.3"/>
-              <rect x="150" y="290" width="50" height="6" rx="3" fill="#1e4b7a" opacity="0.3"/>
-              <rect x="150" y="305" width="55" height="6" rx="3" fill="#1e4b7a" opacity="0.3"/>
-            </g>
-
-            {/* Central BlogSphere Icon */}
-            <g transform="translate(170, 120)">
-              <circle cx="30" cy="30" r="30" fill="white" opacity="0.2"/>
-              <circle cx="30" cy="30" r="20" fill="white" opacity="0.3"/>
-              <BookOpen x="18" y="18" width="24" height="24" color="white" className="absolute"/>
-            </g>
-
-            {/* Decorative Icons */}
-            <g className="animate-pulse">
-              <PenTool x="280" y="60" width="24" height="24" color="white" opacity="0.6"/>
-              <Users x="40" y="320" width="24" height="24" color="white" opacity="0.6"/>
-              <TrendingUp x="320" y="320" width="24" height="24" color="white" opacity="0.6"/>
-            </g>
-
-            {/* Connection Lines */}
-            <path d="M120 160 L200 200 L280 240" stroke="rgba(255,255,255,0.2)" strokeWidth="2" fill="none" strokeDasharray="6 6"/>
-            <path d="M160 280 L200 250 L320 220" stroke="rgba(255,255,255,0.2)" strokeWidth="2" fill="none" strokeDasharray="6 6"/>
-          </svg>
-
-          {/* Welcome Text */}
-          <div className="text-center mt-8 text-white">
-            <h2 className="text-2xl font-bold mb-2">Welcome to BlogSphere</h2>
-            <p className="text-white/80">Share your thoughts with the world</p>
-            
-          </div>
-        </div>
-
-        {/* Overlay gradient */}
-        <div className="absolute inset-0 bg-gradient-to-t from-[#1e4b7a]/30 to-transparent pointer-events-none"></div>
-      </div>
 
       {/* Add animation styles */}
       <style>{`

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState, useRef } from 'react';
-import { Heart, MessageSquare, FileText, User, Edit3, Settings, Camera, X, Check } from 'lucide-react';
+import { Heart, MessageSquare, FileText, User, Edit3, Camera, X, Check } from 'lucide-react';
 import Header from '../../Components/Header/Header';
 import Sidebar from '../../Components/Sidebar/Sidebar';
 import Footer from '../../Components/Footer/Footer';
@@ -36,29 +36,78 @@ export default function ProfilePage() {
     const load = async () => {
       setLoading(true);
       try {
-        const [profileRes, blogsRes, followersRes, followingRes] = await Promise.all([
+        // Get current user ID from localStorage or use current user logic
+        let currentUserId = '';
+        try {
+          const userFromStorage = localStorage.getItem('user');
+          if (userFromStorage) {
+            const parsedUser = JSON.parse(userFromStorage);
+            currentUserId = parsedUser._id || '';
+          }
+        } catch (e) {
+          console.log('Could not get user from storage');
+        }
+
+        let [profileRes, blogsRes, followersRes, followingRes] = await Promise.all([
           blogService.fetchUserProfile(),
           blogService.fetchCurrentUserBlogs().catch(() => null),
-          blogService.getFollowers().catch(() => null),
-          blogService.getFollowing().catch(() => null)
+          currentUserId ? blogService.getUserFollowers(currentUserId).catch(() => null) : null,
+          currentUserId ? blogService.getUserFollowing(currentUserId).catch(() => null) : null
         ]);
 
-        const profile: UserType | undefined = profileRes?.result;
-        if (profile) {
-          setUser(profile);
+        console.log('Profile API Response:', profileRes);
+        console.log('Followers API Response:', followersRes);
+        console.log('Following API Response:', followingRes);
+        console.log('Current User ID used for API:', currentUserId);
+        
+        const profileResponse: any = profileRes?.result || profileRes?.data || profileRes;
+        let userIdForConnections = currentUserId;
+
+        if (profileResponse && typeof profileResponse === 'object') {
+          setUser(profileResponse);
+          userIdForConnections = profileResponse._id || profileResponse.id || currentUserId;
+          console.log('User Profile Data Set:', profileResponse);
           setEditForm({
-            name: profile.name || '',
-            email: profile.email || '',
-            bio: profile.about || '',
-            profile_image: profile.profile_image || ''
+            name: profileResponse.name || '',
+            email: profileResponse.email || '',
+            bio: profileResponse.about || '',
+            profile_image: profileResponse.profile_image || ''
           });
         }
 
-        const blogs: Blog[] = (blogsRes as any)?.result || [];
+        // If we didn't have a userId before but we do now from the profile, fetch connections
+        if (!currentUserId && userIdForConnections) {
+          const [follRes, fingRes] = await Promise.all([
+            blogService.getUserFollowers(userIdForConnections).catch(() => null),
+            blogService.getUserFollowing(userIdForConnections).catch(() => null)
+          ]);
+          followersRes = follRes;
+          followingRes = fingRes;
+        }
+
+        const blogs: Blog[] = (blogsRes as any)?.result || (blogsRes as any)?.data || (Array.isArray(blogsRes) ? blogsRes : []);
         setMyBlogs(blogs);
 
-        setFollowers(((followersRes as any)?.result as UserType[]) || []);
-        setFollowing(((followingRes as any)?.result as UserType[]) || []);
+        // Try to get followers/following from separate API first, then fallback to profile data
+        let followersData = (followersRes as any)?.result || (followersRes as any)?.data || (Array.isArray(followersRes) ? followersRes : []);
+        let followingData = (followingRes as any)?.result || (followingRes as any)?.data || (Array.isArray(followingRes) ? followingRes : []);
+        
+        // If separate API calls returned nothing but profile has data, use profile data
+        if ((!Array.isArray(followersData) || followersData.length === 0) && profileResponse && Array.isArray(profileResponse.followers)) {
+          console.log('Falling back to followers from profile object');
+          followersData = profileResponse.followers;
+        }
+        
+        if ((!Array.isArray(followingData) || followingData.length === 0) && profileResponse && Array.isArray(profileResponse.following)) {
+          console.log('Falling back to following from profile object');
+          followingData = profileResponse.following;
+        }
+        
+        console.log('Final Followers Data:', followersData);
+        console.log('Final Following Data:', followingData);
+        
+        setFollowers(Array.isArray(followersData) ? followersData : []);
+        setFollowing(Array.isArray(followingData) ? followingData : []);
       } catch (e) {
         console.error(e);
         toast.error('Failed to load profile');
@@ -206,9 +255,6 @@ export default function ProfilePage() {
                     <Edit3 className="w-4 h-4" />
                     Edit Profile
                   </button>
-                  <button className="p-2.5 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors">
-                    <Settings className="w-5 h-5 text-gray-600" />
-                  </button>
                 </div>
               </div>
             </div>
@@ -265,6 +311,81 @@ export default function ProfilePage() {
                   <span className="text-2xl font-bold text-gray-900">{loading ? '-' : following.length}</span>
                 </div>
                 <h3 className="text-gray-600 text-sm font-medium">Following</h3>
+              </div>
+            </div>
+          </div>
+
+          {/* Followers & Following Lists */}
+          <div className={`py-6 ${isSidebarCollapsed ? 'pl-8 pr-4 sm:pl-10 sm:pr-6 lg:pl-12 lg:pr-8' : 'pl-6 pr-4 sm:pl-8 sm:pr-6 lg:pl-10 lg:pr-8'}`}>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Followers List */}
+              <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                <div className="p-5 border-b border-gray-200 bg-gray-50">
+                  <h3 className="text-lg font-semibold text-gray-900">Followers ({followers.length})</h3>
+                </div>
+                <div className="max-h-80 overflow-auto">
+                  {followers.length === 0 ? (
+                    <div className="p-8 text-center text-gray-500">
+                      <User className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+                      <p>No followers yet</p>
+                    </div>
+                  ) : (
+                    <div className="divide-y divide-gray-100">
+                      {followers.map((follower) => (
+                        <div key={follower._id} className="p-4 hover:bg-gray-50 transition-colors">
+                          <div className="flex items-center gap-3">
+                            {follower.profile_image ? (
+                              <img src={follower.profile_image} className="w-10 h-10 rounded-full object-cover" alt={follower.name} />
+                            ) : (
+                              <div className="w-10 h-10 rounded-full bg-[#0077b6] text-white flex items-center justify-center font-semibold">
+                                {(follower.name || follower.email || 'U')[0]?.toUpperCase()}
+                              </div>
+                            )}
+                            <div className="flex-1 min-w-0">
+                              <p className="font-medium text-gray-900 truncate">{follower.name || 'User'}</p>
+                              <p className="text-sm text-gray-500 truncate">{follower.email}</p>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Following List */}
+              <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                <div className="p-5 border-b border-gray-200 bg-gray-50">
+                  <h3 className="text-lg font-semibold text-gray-900">Following ({following.length})</h3>
+                </div>
+                <div className="max-h-80 overflow-auto">
+                  {following.length === 0 ? (
+                    <div className="p-8 text-center text-gray-500">
+                      <User className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+                      <p>Not following anyone yet</p>
+                    </div>
+                  ) : (
+                    <div className="divide-y divide-gray-100">
+                      {following.map((followingUser) => (
+                        <div key={followingUser._id} className="p-4 hover:bg-gray-50 transition-colors">
+                          <div className="flex items-center gap-3">
+                            {followingUser.profile_image ? (
+                              <img src={followingUser.profile_image} className="w-10 h-10 rounded-full object-cover" alt={followingUser.name} />
+                            ) : (
+                              <div className="w-10 h-10 rounded-full bg-[#0077b6] text-white flex items-center justify-center font-semibold">
+                                {(followingUser.name || followingUser.email || 'U')[0]?.toUpperCase()}
+                              </div>
+                            )}
+                            <div className="flex-1 min-w-0">
+                              <p className="font-medium text-gray-900 truncate">{followingUser.name || 'User'}</p>
+                              <p className="text-sm text-gray-500 truncate">{followingUser.email}</p>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           </div>
@@ -421,7 +542,10 @@ export default function ProfilePage() {
                                 </div>
                                 <div className="bg-white/80 rounded-xl p-4">
                                   <p className="text-gray-800 mb-2">{comment.msg}</p>
-                                  <p className="text-sm text-gray-500">- {comment.userId?.name || 'Anonymous'}</p>
+                                  <p className="text-sm text-gray-500">
+                                    - {comment.userId?.name || 'User'} 
+                                    {comment.userId?.email ? ` (${comment.userId.email})` : ''}
+                                  </p>
                                 </div>
                               </div>
                             ))}

@@ -317,17 +317,43 @@ class BlogServices {
   }
 
   async getUserFollowers(userId: string) {
-    const userRes = await this.getUserById(userId);
-    const user: any = (userRes as any)?.result || (userRes as any)?.data || userRes;
-    const followers = Array.isArray(user?.followers) ? user.followers : [];
-    return { result: followers } as any;
+    try {
+      return await this.tryGet([
+        `${this.userUrl}/followers/${userId}`,
+        `${this.userUrl}/${userId}/followers`,
+        `${this.userProfileUrl}/followers/${userId}`
+      ]);
+    } catch (e) {
+      // Fallback to old method if new endpoints don't work
+      try {
+        const userRes = await this.getUserById(userId);
+        const user: any = (userRes as any)?.result || (userRes as any)?.data || userRes;
+        const followers = Array.isArray(user?.followers) ? user.followers : [];
+        return { result: followers } as any;
+      } catch {
+        return { result: [] } as any;
+      }
+    }
   }
 
   async getUserFollowing(userId: string) {
-    const userRes = await this.getUserById(userId);
-    const user: any = (userRes as any)?.result || (userRes as any)?.data || userRes;
-    const following = Array.isArray(user?.following) ? user.following : [];
-    return { result: following } as any;
+    try {
+      return await this.tryGet([
+        `${this.userUrl}/following/${userId}`,
+        `${this.userUrl}/${userId}/following`,
+        `${this.userProfileUrl}/following/${userId}`
+      ]);
+    } catch (e) {
+      // Fallback to old method if new endpoints don't work
+      try {
+        const userRes = await this.getUserById(userId);
+        const user: any = (userRes as any)?.result || (userRes as any)?.data || userRes;
+        const following = Array.isArray(user?.following) ? user.following : [];
+        return { result: following } as any;
+      } catch {
+        return { result: [] } as any;
+      }
+    }
   }
 }
 

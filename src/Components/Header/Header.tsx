@@ -223,6 +223,7 @@ export default function Header({ isSidebarCollapsed = false }: HeaderProps) {
                 <div className="text-sm font-semibold text-gray-900 leading-5 truncate max-w-[220px]">
                   {isUserLoading ? <Skeleton className="h-4 w-28" /> : user?.name}
                 </div>
+                
               </div>
             </button>
           </div>
