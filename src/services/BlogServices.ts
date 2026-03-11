@@ -2,7 +2,7 @@ import toast from 'react-hot-toast';
 import { authService } from '../services/AuthService';
 import axios from 'axios';
 
-const API_BASE_URL = (import.meta as any).env?.VITE_API_BASE_URL || 'https://blog-web-app-iota.vercel.app/api/';
+const API_BASE_URL = (import.meta as any).env?.VITE_API_BASE_URL || 'https://blog-web-app-backend-one.vercel.app/api/';
 
 class BlogServices {
   baseUrl = API_BASE_URL;
