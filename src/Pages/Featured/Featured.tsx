@@ -134,7 +134,7 @@ export default function Featured({ isSidebarCollapsed = false }: FeaturedProps) 
   };
 
   const shareLinkFor = (blogId: string) => {
-    return `${window.location.origin}${routepath.blogDetails}/${blogId}`;
+    return `${window.location.origin}/#${routepath.blogDetails}/${blogId}`;
   };
 
   const handleSimpleShare = async (blogId: string) => {

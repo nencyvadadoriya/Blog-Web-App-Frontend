@@ -1,4 +1,4 @@
-import { createBrowserRouter } from "react-router";
+import { createHashRouter } from "react-router";
 import App from "../server";
 import LoginPage from "../Pages/Auth/LoginPage.tsx";
 import RegisterPage from "../Pages/Auth/RegisterPage.tsx";
@@ -35,7 +35,7 @@ export const routepath = {
     userProfile: '/user'
 }
 
-export const route = createBrowserRouter([
+export const route = createHashRouter([
     {
         path: '/',
         Component: App,
