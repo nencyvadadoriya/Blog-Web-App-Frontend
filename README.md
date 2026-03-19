@@ -50,14 +50,22 @@ A **full-stack Blog Application** built with **React**, **Node.js**, **Express**
   </tr>
    <tr>
     <td><img src="./public/img-3.png" width="500" /></td>
-    <td><img src="./public/img-4.png" width="500" /></td>
+    <td><img src="./public/img-6.png" width="500" /></td>
   </tr>
   <tr>
     <td><img src="./public/img-5.png" width="500" /></td>
-    <td><img src="./public/img-6.png" width="500" /></td>
+     <td><img src="./public/img-7.png" width="500" /></td>
   </tr>
    <tr>
-    <td><img src="./public/img-7.png" width="500" /></td>
     <td><img src="./public/img-8.png" width="500" /></td>
+    <td><img src="./public/img9.png" width="500" /></td>
+  </tr>
+  <tr>
+    <td><img src="./public/img10.png" width="500" /></td>
+    <td><img src="./public/img11.png" width="500" /></td>
+  </tr>
+  <tr>
+    <td><img src="./public/img12.png" width="500" /></td>
+    <td><img src="./public/img13.png" width="500" /></td>
   </tr>
 </table>
