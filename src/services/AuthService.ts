@@ -2,7 +2,7 @@ import axios from "axios";
 import type { ChangePasswordPayload, LoginBody, OtpverifyPayload, RegisterUserBody } from "../Types/Types";
 import toast from "react-hot-toast";
 
-const API_BASE_URL = (import.meta as any).env?.VITE_API_BASE_URL || 'https://blog-web-app-backend-woad.vercel.app/api/';
+const API_BASE_URL = (import.meta as any).env?.VITE_API_BASE_URL || 'https://blog-web-app-backend-02ul.onrender.com/api/';
 
 class AuthServices {
     authBaseUrl = API_BASE_URL;
